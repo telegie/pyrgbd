@@ -48,6 +48,10 @@ def main():
     print(str(lib.RGBD_MINOR_VERSION()))
     print(str(lib.RGBD_PATCH_VERSION()))
 
+    video_path = "/Users/hanseuljun/repos/telegie-app/deps/librgbd/videos/joe.mkv"
+    file_parser_ptr = lib.rgbd_file_parser_ctor_from_path(video_path.encode("utf8"))
+
+
 
 if __name__ == "__main__":
     main()
