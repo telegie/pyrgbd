@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/GSL" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/cli" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/cxxopts" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/ffmpeg-binaries" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/ffmpeg-binaries/FFmpeg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/ffmpeg-binaries/libvpx-binaries" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/ffmpeg-binaries/libvpx-binaries/libvpx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/ffmpeg-binaries/opus-binaries" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/ffmpeg-binaries/opus-binaries/opus" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/glm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/json" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/libebml" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/libmatroska" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/libpng-binaries" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/libpng-binaries/libpng" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/libpng-binaries/zlib-binaries" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/libpng-binaries/zlib-binaries/zlib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/opencv-binaries" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/opencv-binaries/opencv" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/opencv-binaries/opencv_contrib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/spdlog" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/zstd" vcs="Git" />
+  </component>
+</project>
