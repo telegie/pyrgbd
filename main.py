@@ -24,6 +24,7 @@ def main():
 
     y_channel_buffer = ffi.buffer(y_channel.get_data(), y_channel.get_size())
 
+    # np.frombuffer does not copy
     y_array = np.frombuffer(y_channel_buffer, dtype = np.uint8)
     y_array = y_array.reshape((color_track.height, color_track.width))
 

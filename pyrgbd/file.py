@@ -1,5 +1,5 @@
 from ._librgbd import ffi, lib
-from pyrgbd import capi_utils as rgbd_capi_utils
+from .capi_containers import NativeByteArray
 
 
 class NativeFileInfo:
@@ -86,8 +86,8 @@ class NativeFileVideoFrame:
     def get_global_timecode(self) -> int:
         return lib.rgbd_file_video_frame_get_global_timecode(self.ptr)
 
-    def get_color_bytes(self) -> rgbd_capi_utils.CByteArray:
-        return rgbd_capi_utils.CByteArray(lib.rgbd_file_video_frame_get_color_bytes(self.ptr))
+    def get_color_bytes(self) -> NativeByteArray:
+        return NativeByteArray(lib.rgbd_file_video_frame_get_color_bytes(self.ptr))
 
 
 class NativeFile:
