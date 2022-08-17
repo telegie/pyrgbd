@@ -36,13 +36,13 @@ class NativeFileVideoTrack:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def get_track_number(self):
+    def get_track_number(self) -> int:
         return lib.rgbd_file_video_track_get_track_number(self.ptr)
 
-    def get_width(self):
+    def get_width(self) -> int:
         return lib.rgbd_file_video_track_get_width(self.ptr)
 
-    def get_height(self):
+    def get_height(self) -> int:
         return lib.rgbd_file_video_track_get_height(self.ptr)
 
 
@@ -130,8 +130,10 @@ class FileVideoTrack:
 
 class FileTracks:
     def __init__(self, native_file_tracks: NativeFileTracks):
-        self.color_track = FileVideoTrack(native_file_tracks.get_color_track())
-        self.depth_track = FileVideoTrack(native_file_tracks.get_depth_track())
+        with native_file_tracks.get_color_track() as color_track:
+            self.color_track = FileVideoTrack(color_track)
+        with native_file_tracks.get_depth_track() as depth_track:
+            self.depth_track = FileVideoTrack(depth_track)
 
 
 class FileVideoFrame:
@@ -142,9 +144,12 @@ class FileVideoFrame:
 
 class File:
     def __init__(self, native_file: NativeFile):
-        self.info = FileInfo(native_file.get_info())
-        self.tracks = FileTracks(native_file.get_tracks())
+        with native_file.get_info() as info:
+            self.info = FileInfo(info)
+        with native_file.get_tracks() as tracks:
+            self.tracks = FileTracks(tracks)
         self.video_frames = []
         video_frame_count = native_file.get_video_frame_count()
         for index in range(video_frame_count):
-            self.video_frames.append(FileVideoFrame(native_file.get_video_frame(index)))
+            with native_file.get_video_frame(index) as file_video_frame:
+                self.video_frames.append(FileVideoFrame(file_video_frame))

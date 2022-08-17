@@ -1,6 +1,5 @@
 from pyrgbd import file as rgbd_file
 from pyrgbd import file_parser as rgbd_file_parser
-from pyrgbd import capi_utils as rgbd_capi_utils
 from pyrgbd import ffmpeg as rgbd_ffmpeg
 from pyrgbd._librgbd import ffi
 import numpy as np
@@ -19,12 +18,11 @@ def main():
     color_bytes_data = color_bytes.get_data()
     color_bytes_size = color_bytes.get_size()
 
-    video_decoder = rgbd_ffmpeg.NativeFFmpegVideoDecoder()
-    yuv_frame = video_decoder.decode(color_bytes_data, color_bytes_size)
-    y_channel_array = yuv_frame.get_y_channel()
-    y_channel_array.get_size()
+    with rgbd_ffmpeg.NativeFFmpegVideoDecoder() as color_decoder:
+        with color_decoder.decode(color_bytes_data, color_bytes_size) as yuv_frame:
+            y_channel = yuv_frame.get_y_channel()
 
-    y_channel_buffer = ffi.buffer(y_channel_array.get_data(), y_channel_array.get_size())
+    y_channel_buffer = ffi.buffer(y_channel.get_data(), y_channel.get_size())
 
     y_array = np.frombuffer(y_channel_buffer, dtype = np.uint8)
     y_array = y_array.reshape((color_track.height, color_track.width))
