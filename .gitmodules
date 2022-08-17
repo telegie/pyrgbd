@@ -1,0 +1,3 @@
+[submodule "librgbd-binaries"]
+	path = librgbd-binaries
+	url = git@github.com:telegie/librgbd-binaries.git
