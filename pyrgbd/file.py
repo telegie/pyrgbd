@@ -139,7 +139,7 @@ class FileTracks:
 class FileVideoFrame:
     def __init__(self, native_file_video_frame: NativeFileVideoFrame):
         self.global_timecode = native_file_video_frame.get_global_timecode()
-        self.color_bytes = native_file_video_frame.get_color_bytes()
+        self.color_bytes = native_file_video_frame.get_color_bytes().to_np_array()
 
 
 class File:
