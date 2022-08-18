@@ -89,6 +89,9 @@ class NativeFileVideoFrame:
     def get_color_bytes(self) -> NativeByteArray:
         return NativeByteArray(lib.rgbd_file_video_frame_get_color_bytes(self.ptr))
 
+    def get_depth_bytes(self) -> NativeByteArray:
+        return NativeByteArray(lib.rgbd_file_video_frame_get_depth_bytes(self.ptr))
+
 
 class NativeFile:
     def __init__(self, ptr):
@@ -141,6 +144,8 @@ class FileVideoFrame:
         self.global_timecode = native_file_video_frame.get_global_timecode()
         with native_file_video_frame.get_color_bytes() as color_bytes:
             self.color_bytes = color_bytes.to_np_array()
+        with native_file_video_frame.get_depth_bytes() as depth_bytes:
+            self.depth_bytes = depth_bytes.to_np_array()
 
 
 class File:

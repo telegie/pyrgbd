@@ -13,6 +13,9 @@ def main():
     color_track = file.tracks.color_track
     color_bytes = file.video_frames[0].color_bytes
 
+    depth_track = file.tracks.depth_track
+    depth_bytes = file.video_frames[0].depth_bytes
+
     with rgbd.NativeFFmpegVideoDecoder() as color_decoder:
         with color_decoder.decode(rgbd.cast_to_pointer(color_bytes.ctypes.data), color_bytes.size) as yuv_frame:
             with yuv_frame.get_y_channel() as y_channel:
@@ -22,9 +25,15 @@ def main():
             with yuv_frame.get_v_channel() as v_channel:
                 v_array = v_channel.to_np_array()
 
+    with rgbd.NativeTDC1Decoder() as depth_decoder:
+        with depth_decoder.decode(rgbd.cast_to_pointer(depth_bytes.ctypes.data), depth_bytes.size) as depth_frame:
+            with depth_frame.get_values() as depth_values:
+                depth_array = depth_values.to_np_array()
+
     y_array = y_array.reshape((color_track.height, color_track.width))
     u_array = u_array.reshape((color_track.height // 2, color_track.width // 2))
     v_array = v_array.reshape((color_track.height // 2, color_track.width // 2))
+    depth_array = depth_array.reshape((depth_track.height, depth_track.width))
 
     print(f"color_track.width: {color_track.width}")
     print(f"color_track.height: {color_track.height}")
@@ -34,6 +43,7 @@ def main():
     cv2.imshow("y_array", y_array)
     cv2.imshow("u_array", u_array)
     cv2.imshow("v_array", v_array)
+    cv2.imshow("depth_array", depth_array)
 
     # Open In-memory bytes streams (instead of using fifo)
     f = io.BytesIO()
