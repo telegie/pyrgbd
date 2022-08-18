@@ -29,12 +29,12 @@ class NativeByteArray:
         return np_array.copy()
 
 
-class NativeInt16Array:
+class NativeInt32Array:
     def __init__(self, ptr):
         self.ptr = ptr
 
     def close(self):
-        lib.rgbd_native_int16_array_dtor(self.ptr)
+        lib.rgbd_native_int32_array_dtor(self.ptr)
 
     def __enter__(self):
         return self
@@ -43,17 +43,17 @@ class NativeInt16Array:
         self.close()
 
     def get_data(self):
-        return lib.rgbd_native_int16_array_get_data(self.ptr)
+        return lib.rgbd_native_int32_array_get_data(self.ptr)
 
     def get_size(self) -> int:
-        return lib.rgbd_native_int16_array_get_size(self.ptr)
+        return lib.rgbd_native_int32_array_get_size(self.ptr)
 
     def to_np_array(self) -> np.array:
-        # Multiplying 2 since int16 is 2 bytes and the second argument
+        # Multiplying 4 since int32 is 2 bytes and the second argument
         # is for the byte size.
-        buffer = ffi.buffer(self.get_data(), self.get_size() * 2)
+        buffer = ffi.buffer(self.get_data(), self.get_size() * 4)
         # np.frombuffer does not copy, so returning a copy.
-        np_array = np.frombuffer(buffer, dtype=np.int16)
+        np_array = np.frombuffer(buffer, dtype=np.int32)
         return np_array.copy()
 
 
