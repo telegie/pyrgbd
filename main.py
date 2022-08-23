@@ -4,7 +4,7 @@ import io
 import numpy as np
 import requests
 import os.path
-import matplotlib.pyplot as plt
+import vedo
 
 
 def merge_yuv_arrays_to_bgr(y_array, u_array, v_array):
@@ -35,6 +35,8 @@ def main():
         with open(video_file_path, "wb") as file:
             file.write(response.content)
 
+    # Get directions array from the native_camera_calibration.
+    # native_camera_calibration should be GC'ed here while directions will be needed.
     directions = []
     with rgbd.NativeFileParser(video_file_path) as native_file_parser:
         with native_file_parser.parse_all_frames() as native_file:
@@ -43,16 +45,14 @@ def main():
                 with native_attachments.get_camera_calibration() as native_camera_calibration:
                     depth_width = native_camera_calibration.get_depth_width()
                     depth_height = native_camera_calibration.get_depth_height()
-                    for col in range(depth_width):
-                        for row in range(depth_height):
+                    for row in range(depth_height):
+                        v = row / depth_height
+                        for col in range(depth_width):
                             u = col / depth_width
-                            v = row / depth_height
                             with native_camera_calibration.get_direction(u, v) as native_direction:
                                 directions.append(native_direction.to_np_array())
 
-    print(f"directions.shape-1: {np.array(directions).shape}")
     directions = np.reshape(directions, (depth_height, depth_width, 3))
-    print(f"directions.shape-2: {directions.shape}")
 
     color_track = file.tracks.color_track
     color_bytes = file.video_frames[0].color_bytes
@@ -60,6 +60,7 @@ def main():
     depth_track = file.tracks.depth_track
     depth_bytes = file.video_frames[0].depth_bytes
 
+    # Get the first color frame from the video.
     with rgbd.NativeFFmpegVideoDecoder() as color_decoder:
         with color_decoder.decode(rgbd.cast_to_pointer(color_bytes.ctypes.data), color_bytes.size) as yuv_frame:
             with yuv_frame.get_y_channel() as y_channel:
@@ -69,6 +70,7 @@ def main():
             with yuv_frame.get_v_channel() as v_channel:
                 v_array = v_channel.to_np_array()
 
+    # Get the first depth frame from the video.
     with rgbd.NativeDepthDecoder() as depth_decoder:
         with depth_decoder.decode(rgbd.cast_to_pointer(depth_bytes.ctypes.data), depth_bytes.size) as depth_frame:
             with depth_frame.get_values() as depth_values:
@@ -85,25 +87,24 @@ def main():
     cv2.imshow("bgr", bgr)
     cv2.imshow("depth", depth_array.astype(np.uint16))
 
-    x = []
-    y = []
-    z = []
-    for col in range(0, depth_track.width, 5):
-        for row in range(0, depth_track.height, 5):
+    points = []
+    colors = []
+    step = color_track.width / depth_track.width
+    for row in range(depth_track.height):
+        for col in range(depth_track.width):
             direction = directions[row][col]
-            # print(f"direction: {direction}")
             depth = depth_array[row][col]
-            x.append(direction[0] * depth * 0.001)
-            y.append(direction[1] * depth * 0.001)
-            z.append(direction[2] * depth * 0.001)
+            points.append(direction * depth * 0.001)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z, c='r', marker='o')
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
-    plt.show()
+            color = bgr[int(row * step)][int(col * step)]
+            # flip bgr to rgb
+            color = np.array([color[2], color[1], color[0]])
+            colors.append(color)
+
+    points = np.array(points)
+    colors = np.array(colors)
+    points = vedo.Points(points, c=colors)
+    vedo.show(points)
 
     cv2.waitKey(0)
 
