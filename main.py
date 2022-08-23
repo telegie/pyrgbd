@@ -4,7 +4,7 @@ import io
 import numpy as np
 import requests
 import os.path
-#import open3d as o3d
+import matplotlib.pyplot as plt
 
 
 def merge_yuv_arrays_to_bgr(y_array, u_array, v_array):
@@ -29,25 +29,30 @@ def merge_yuv_arrays_to_bgr(y_array, u_array, v_array):
 def main():
     video_file_path = "tmp/example.mkv"
     if not os.path.exists(video_file_path):
-        video_id = rgbd.decode_base64url_to_long("QsphtMiMlSo")
+        video_id = rgbd.decode_base64url_to_long("cOp3Qpzw-XE")
         video_url = f"https://videos.telegie.com/v1/{video_id}/{video_id}.mkv"
         response = requests.get(video_url)
         with open(video_file_path, "wb") as file:
             file.write(response.content)
 
+    directions = []
     with rgbd.NativeFileParser(video_file_path) as native_file_parser:
         with native_file_parser.parse_all_frames() as native_file:
             file = rgbd.File(native_file)
             with native_file.get_attachments() as native_attachments:
                 with native_attachments.get_camera_calibration() as native_camera_calibration:
-                    calibration_depth_width = native_camera_calibration.get_depth_width()
-                    calibration_depth_height = native_camera_calibration.get_depth_height()
-                    with native_camera_calibration.get_direction(0.0, 0.0) as native_direction:
-                        direction = native_direction.to_np_array()
+                    depth_width = native_camera_calibration.get_depth_width()
+                    depth_height = native_camera_calibration.get_depth_height()
+                    for col in range(depth_width):
+                        for row in range(depth_height):
+                            u = col / depth_width
+                            v = row / depth_height
+                            with native_camera_calibration.get_direction(u, v) as native_direction:
+                                directions.append(native_direction.to_np_array())
 
-    print(f"calibration_depth_width: {calibration_depth_width}")
-    print(f"calibration_depth_height: {calibration_depth_height}")
-    print(f"direction: {direction}")
+    print(f"directions.shape-1: {np.array(directions).shape}")
+    directions = np.reshape(directions, (depth_height, depth_width, 3))
+    print(f"directions.shape-2: {directions.shape}")
 
     color_track = file.tracks.color_track
     color_bytes = file.video_frames[0].color_bytes
@@ -79,6 +84,27 @@ def main():
     bgr = merge_yuv_arrays_to_bgr(y_array, u_array, v_array)
     cv2.imshow("bgr", bgr)
     cv2.imshow("depth", depth_array.astype(np.uint16))
+
+    x = []
+    y = []
+    z = []
+    for col in range(0, depth_track.width, 5):
+        for row in range(0, depth_track.height, 5):
+            direction = directions[row][col]
+            # print(f"direction: {direction}")
+            depth = depth_array[row][col]
+            x.append(direction[0] * depth * 0.001)
+            y.append(direction[1] * depth * 0.001)
+            z.append(direction[2] * depth * 0.001)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, c='r', marker='o')
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+    plt.show()
+
     cv2.waitKey(0)
 
 
