@@ -2,6 +2,8 @@ import pyrgbd as rgbd
 import cv2
 import io
 import numpy as np
+import requests
+import os.path
 #import open3d as o3d
 
 
@@ -25,7 +27,14 @@ def merge_yuv_arrays_to_bgr(y_array, u_array, v_array):
 
 
 def main():
-    video_file_path = "/Users/hanseuljun/repos/telegie-app/deps/librgbd/videos/TELEGIE_14.v30.mkv"
+    video_file_path = "tmp/example.mkv"
+    if not os.path.exists(video_file_path):
+        video_id = rgbd.decode_base64url_to_long("QsphtMiMlSo")
+        video_url = f"https://videos.telegie.com/v1/{video_id}/{video_id}.mkv"
+        response = requests.get(video_url)
+        with open(video_file_path, "wb") as file:
+            file.write(response.content)
+
     with rgbd.NativeFileParser(video_file_path) as native_file_parser:
         with native_file_parser.parse_all_frames() as native_file:
             file = rgbd.File(native_file)
