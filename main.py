@@ -27,6 +27,7 @@ def merge_yuv_arrays_to_bgr(y_array, u_array, v_array):
 
 
 def main():
+
     video_file_path = "tmp/example.mkv"
     if not os.path.exists(video_file_path):
         video_id = rgbd.decode_base64url_to_long("cOp3Qpzw-XE")

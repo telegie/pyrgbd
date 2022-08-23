@@ -1,4 +1,6 @@
 # pyrgbd
 
-- Run pyrgbd/build_librgbd.py.
-- Run main.py 
+## Before Using
+
+Run "python pyrgbd/build_librgbd.py" to build the binary files needed for pyrgbd to operate.
+ 

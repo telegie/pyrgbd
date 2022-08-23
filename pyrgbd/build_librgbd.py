@@ -4,8 +4,9 @@ import os
 
 
 def build_librgbd():
-    librgbd_include_dir = Path("../librgbd-binaries/1.3.0/arm64-mac/include").absolute()
-    librgbd_library_dir = Path("../librgbd-binaries/1.3.0/arm64-mac/bin").absolute()
+    script_path = Path(__file__).parent.resolve()
+    librgbd_include_dir = Path(f"{script_path}/../librgbd-binaries/1.3.0/arm64-mac/include").absolute()
+    librgbd_library_dir = Path(f"{script_path}/../librgbd-binaries/1.3.0/arm64-mac/bin").absolute()
 
     ffi = FFI()
 
@@ -15,7 +16,7 @@ def build_librgbd():
                    libraries=['rgbd-1'],
                    library_dirs=[str(librgbd_library_dir)],
                    extra_link_args=[
-                       '-Wl,-rpath,/Users/hanseuljun/repos/pyrgbd/librgbd-binaries/1.3.0/arm64-mac/bin']
+                       f"-Wl,-rpath,{script_path}/../librgbd-binaries/1.3.0/arm64-mac/bin"]
                    )
 
     cdef_lines = []
@@ -37,8 +38,8 @@ def build_librgbd():
             cdef_lines.append(line)
 
     ffi.cdef("".join(cdef_lines))
-    ffi.compile()
-    print("built librgbd")
+    ffi.compile(tmpdir=script_path)
+    print(f"built librgbd: {script_path}")
 
 
 def main():
