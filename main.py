@@ -42,9 +42,12 @@ def main():
                 with native_attachments.get_camera_calibration() as native_camera_calibration:
                     calibration_depth_width = native_camera_calibration.get_depth_width()
                     calibration_depth_height = native_camera_calibration.get_depth_height()
+                    with native_camera_calibration.get_direction(0.0, 0.0) as native_direction:
+                        direction = native_direction.to_np_array()
 
     print(f"calibration_depth_width: {calibration_depth_width}")
     print(f"calibration_depth_height: {calibration_depth_height}")
+    print(f"direction: {direction}")
 
     color_track = file.tracks.color_track
     color_bytes = file.video_frames[0].color_bytes

@@ -1,4 +1,5 @@
 from ._librgbd import ffi, lib
+from .capi_containers import NativeFloatArray
 
 
 class NativeCameraCalibration:
@@ -21,3 +22,6 @@ class NativeCameraCalibration:
 
     def get_depth_height(self):
         return lib.rgbd_camera_calibration_get_depth_height(self.ptr)
+
+    def get_direction(self, uv_u: float, uv_v: float) -> NativeFloatArray:
+        return NativeFloatArray(lib.rgbd_camera_calibration_get_direction(self.ptr, uv_u, uv_v))
