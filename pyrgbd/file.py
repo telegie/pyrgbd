@@ -1,5 +1,6 @@
 from ._librgbd import ffi, lib
 from .capi_containers import NativeByteArray
+from .calibration import NativeCameraCalibration
 
 
 class NativeFileInfo:
@@ -68,6 +69,25 @@ class NativeFileTracks:
         return NativeFileVideoTrack(lib.rgbd_file_tracks_get_depth_track(self.ptr), False)
 
 
+class NativeFileAttachments:
+    def __init__(self, ptr, owner: bool):
+        self.ptr = ptr
+        self.owner = owner
+
+    def close(self):
+        if self.owner:
+            lib.rgbd_file_attachments_dtor(self.ptr)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def get_camera_calibration(self) -> NativeCameraCalibration:
+        return NativeCameraCalibration(lib.rgbd_file_attachments_get_camera_calibration(self.ptr), False)
+
+
 class NativeFileVideoFrame:
     def __init__(self, ptr, owner: bool):
         self.ptr = ptr
@@ -111,6 +131,9 @@ class NativeFile:
 
     def get_tracks(self) -> NativeFileTracks:
         return NativeFileTracks(lib.rgbd_file_get_tracks(self.ptr), False)
+
+    def get_attachments(self) -> NativeFileAttachments:
+        return NativeFileAttachments(lib.rgbd_file_get_attachments(self.ptr), False)
 
     def get_video_frame_count(self) -> int:
         return lib.rgbd_file_get_video_frame_count(self.ptr)

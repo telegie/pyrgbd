@@ -38,6 +38,13 @@ def main():
     with rgbd.NativeFileParser(video_file_path) as native_file_parser:
         with native_file_parser.parse_all_frames() as native_file:
             file = rgbd.File(native_file)
+            with native_file.get_attachments() as native_attachments:
+                with native_attachments.get_camera_calibration() as native_camera_calibration:
+                    calibration_depth_width = native_camera_calibration.get_depth_width()
+                    calibration_depth_height = native_camera_calibration.get_depth_height()
+
+    print(f"calibration_depth_width: {calibration_depth_width}")
+    print(f"calibration_depth_height: {calibration_depth_height}")
 
     color_track = file.tracks.color_track
     color_bytes = file.video_frames[0].color_bytes
