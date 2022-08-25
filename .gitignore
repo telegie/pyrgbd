@@ -132,3 +132,5 @@ dmypy.json
 # Output of cffi
 *.c
 *.o
+*.dll
+pyrgbd/Release

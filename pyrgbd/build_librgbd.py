@@ -10,10 +10,10 @@ def build_librgbd():
     ffi = FFI()
 
     if platform.system() == "Windows":
-        librgbd_path = f"{script_path}/../librgbd-binaries/1.3.0/x64-windows"
-        librgbd_include_dir = f"{librgbd_path}/include"
+        librgbd_path = f"{script_path}\\..\\librgbd-binaries\\1.3.0\\x64-windows"
+        librgbd_include_dir = f"{librgbd_path}\\include"
         library_str = "rgbd-1"
-        librgbd_library_dir = f"{librgbd_path}/bin"
+        librgbd_library_dir = f"{librgbd_path}\\bin"
 
         ffi.set_source('_librgbd',
                        r'#include <rgbd/rgbd_capi.h>',
