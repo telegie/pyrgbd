@@ -1,3 +1,9 @@
+import os
+os.add_dll_directory("C:\\Users\\hanseul\\repos\\pyrgbd\\librgbd-binaries\\1.3.0\\x64-windows/bin")
+
+import sys
+print(f"sys.path: {sys.path}")
+
 import pyrgbd as rgbd
 import cv2
 import io

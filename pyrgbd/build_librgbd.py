@@ -1,23 +1,41 @@
 from cffi import FFI
 from pathlib import Path
 import os
+import platform
 
 
 def build_librgbd():
     script_path = Path(__file__).parent.resolve()
-    librgbd_include_dir = Path(f"{script_path}/../librgbd-binaries/1.3.0/arm64-mac/include").absolute()
-    librgbd_library_dir = Path(f"{script_path}/../librgbd-binaries/1.3.0/arm64-mac/bin").absolute()
 
     ffi = FFI()
 
-    ffi.set_source('_librgbd',
-                   r'#include <rgbd/rgbd_capi.h>',
-                   include_dirs=[str(librgbd_include_dir)],
-                   libraries=['rgbd-1'],
-                   library_dirs=[str(librgbd_library_dir)],
-                   extra_link_args=[
-                       f"-Wl,-rpath,{script_path}/../librgbd-binaries/1.3.0/arm64-mac/bin"]
-                   )
+    if platform.system() == "Windows":
+        librgbd_path = f"{script_path}/../librgbd-binaries/1.3.0/x64-windows"
+        librgbd_include_dir = f"{librgbd_path}/include"
+        library_str = "rgbd-1"
+        librgbd_library_dir = f"{librgbd_path}/bin"
+
+        ffi.set_source('_librgbd',
+                       r'#include <rgbd/rgbd_capi.h>',
+                       include_dirs=[str(librgbd_include_dir)],
+                       libraries=[library_str],
+                       library_dirs=[str(librgbd_library_dir)])
+
+    elif platform.system() == "Darwin":
+        librgbd_path = f"{script_path}/../librgbd-binaries/1.3.0/arm64-mac"
+        librgbd_include_dir = f"{librgbd_path}/include"
+        library_str = "rgbd-1"
+        librgbd_library_dir = f"{librgbd_path}/bin"
+        extra_link_args_str = f"-Wl,-rpath,{str(librgbd_library_dir)}"
+
+        ffi.set_source('_librgbd',
+                       r'#include <rgbd/rgbd_capi.h>',
+                       include_dirs=[str(librgbd_include_dir)],
+                       libraries=[library_str],
+                       library_dirs=[str(librgbd_library_dir)],
+                       extra_link_args=[extra_link_args_str])
+
+
 
     cdef_lines = []
     inside_cplusplus = False
@@ -35,11 +53,13 @@ def build_librgbd():
             # Ignore the directives as cffi cannot handle them.
             if line.startswith("#"):
                 continue
+            # Replace RGBD_INTERFACE_EXPORT, which is added for exporting functions to DLL in windows.
+            line = line.replace("RGBD_INTERFACE_EXPORT", "")
             cdef_lines.append(line)
 
     ffi.cdef("".join(cdef_lines))
-    ffi.compile(tmpdir=script_path)
-    print(f"built librgbd: {script_path}")
+    ffi.compile(verbose=True)
+    print(f"built librgbd")
 
 
 def main():
