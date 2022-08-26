@@ -5,8 +5,6 @@ description = ""
 authors = ["Hanseul Jun <hanseul@telegie.com>"]
 
 [tool.poetry.dependencies]
-# python version is set to exactly 3.9 since vtk does not support python 3.10.
-# This temp detour should be removed later.
 python = "^3.9.0"
 cffi = "^1.15.1"
 numpy = "^1.23.2"

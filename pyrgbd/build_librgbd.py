@@ -35,6 +35,19 @@ def build_librgbd():
                        library_dirs=[str(librgbd_library_dir)],
                        extra_link_args=[extra_link_args_str])
 
+    elif platform.system() == "Linux":
+        librgbd_path = f"{script_path}/../librgbd-binaries/1.3.0/x64-linux"
+        librgbd_include_dir = f"{librgbd_path}/include"
+        library_str = "rgbd-1"
+        librgbd_library_dir = f"{librgbd_path}/bin"
+        extra_link_args_str = f"-Wl,-rpath,{str(librgbd_library_dir)}"
+
+        ffi.set_source('_librgbd',
+                       r'#include <rgbd/rgbd_capi.h>',
+                       include_dirs=[str(librgbd_include_dir)],
+                       libraries=[library_str],
+                       library_dirs=[str(librgbd_library_dir)],
+                       extra_link_args=[extra_link_args_str])
 
 
     cdef_lines = []
