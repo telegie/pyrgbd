@@ -48,7 +48,7 @@ def main():
 
     video_file_path = "tmp/example.mkv"
     if not os.path.exists(video_file_path):
-        video_id = rgbd.decode_base64url_to_long("cOp3Qpzw-XE")
+        video_id = rgbd.decode_base64url_to_long("YyjlJ9wEppo")
         video_url = f"https://videos.telegie.com/v1/{video_id}/{video_id}.mkv"
         response = requests.get(video_url)
         with open(video_file_path, "wb") as file:
@@ -105,6 +105,9 @@ def main():
     bgr = merge_yuv_arrays_to_bgr(y_array, u_array, v_array)
     cv2.imshow("bgr", bgr)
     cv2.imshow("depth", depth_array.astype(np.uint16))
+
+    for imu_frame in file.imu_frames:
+        print(f"gravity: {imu_frame.gravity}")
 
     points = []
     colors = []

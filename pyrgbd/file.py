@@ -1,6 +1,7 @@
 from ._librgbd import ffi, lib
 from .capi_containers import NativeByteArray
 from .calibration import NativeCameraCalibration
+import numpy as np
 
 
 class NativeFileInfo:
@@ -113,6 +114,61 @@ class NativeFileVideoFrame:
         return NativeByteArray(lib.rgbd_file_video_frame_get_depth_bytes(self.ptr))
 
 
+class NativeFileIMUFrame:
+    def __init__(self, ptr, owner: bool):
+        self.ptr = ptr
+        self.owner = owner
+
+    def close(self):
+        if self.owner:
+            lib.rgbd_file_imu_frame_dtor(self.ptr)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def get_global_timecode(self) -> int:
+        return lib.rgbd_file_imu_frame_get_global_timecode(self.ptr)
+
+    def get_acceleration_x(self) -> float:
+        return lib.rgbd_file_imu_frame_get_acceleration_x(self.ptr)
+
+    def get_acceleration_y(self) -> float:
+        return lib.rgbd_file_imu_frame_get_acceleration_y(self.ptr)
+
+    def get_acceleration_z(self) -> float:
+        return lib.rgbd_file_imu_frame_get_acceleration_z(self.ptr)
+
+    def get_rotation_rate_x(self) -> float:
+        return lib.rgbd_file_imu_frame_get_rotation_rate_x(self.ptr)
+
+    def get_rotation_rate_y(self) -> float:
+        return lib.rgbd_file_imu_frame_get_rotation_rate_y(self.ptr)
+
+    def get_rotation_rate_z(self) -> float:
+        return lib.rgbd_file_imu_frame_get_rotation_rate_z(self.ptr)
+
+    def get_magnetic_field_x(self) -> float:
+        return lib.rgbd_file_imu_frame_get_magnetic_field_x(self.ptr)
+
+    def get_magnetic_field_y(self) -> float:
+        return lib.rgbd_file_imu_frame_get_magnetic_field_y(self.ptr)
+
+    def get_magnetic_field_z(self) -> float:
+        return lib.rgbd_file_imu_frame_get_magnetic_field_z(self.ptr)
+
+    def get_gravity_x(self) -> float:
+        return lib.rgbd_file_imu_frame_get_gravity_x(self.ptr)
+
+    def get_gravity_y(self) -> float:
+        return lib.rgbd_file_imu_frame_get_gravity_y(self.ptr)
+
+    def get_gravity_z(self) -> float:
+        return lib.rgbd_file_imu_frame_get_gravity_z(self.ptr)
+
+
 class NativeFile:
     def __init__(self, ptr):
         self.ptr = ptr
@@ -138,8 +194,14 @@ class NativeFile:
     def get_video_frame_count(self) -> int:
         return lib.rgbd_file_get_video_frame_count(self.ptr)
 
-    def get_video_frame(self, index) -> NativeFileVideoFrame:
+    def get_video_frame(self, index: int) -> NativeFileVideoFrame:
         return NativeFileVideoFrame(lib.rgbd_file_get_video_frame(self.ptr, index), False)
+
+    def get_imu_frame_count(self) -> int:
+        return lib.rgbd_file_get_imu_frame_count(self.ptr)
+
+    def get_imu_frame(self, index: int) -> NativeFileIMUFrame:
+        return NativeFileIMUFrame(lib.rgbd_file_get_imu_frame(self.ptr, index), False)
 
 
 class FileInfo:
@@ -171,14 +233,46 @@ class FileVideoFrame:
             self.depth_bytes = depth_bytes.to_np_array()
 
 
+class FileIMUFrame:
+    def __init__(self, native_file_imu_frame: NativeFileIMUFrame):
+        self.global_timecode = native_file_imu_frame.get_global_timecode()
+
+        acceleration_x = native_file_imu_frame.get_acceleration_x()
+        acceleration_y = native_file_imu_frame.get_acceleration_y()
+        acceleration_z = native_file_imu_frame.get_acceleration_z()
+        self.acceleration = np.array([acceleration_x, acceleration_y, acceleration_z])
+
+        rotation_rate_x = native_file_imu_frame.get_rotation_rate_x()
+        rotation_rate_y = native_file_imu_frame.get_rotation_rate_y()
+        rotation_rate_z = native_file_imu_frame.get_rotation_rate_z()
+        self.rotation_rate = np.array([rotation_rate_x, rotation_rate_y, rotation_rate_z])
+
+        magnetic_field_x = native_file_imu_frame.get_magnetic_field_x()
+        magnetic_field_y = native_file_imu_frame.get_magnetic_field_y()
+        magnetic_field_z = native_file_imu_frame.get_magnetic_field_z()
+        self.magnetic_field = np.array([magnetic_field_x, magnetic_field_y, magnetic_field_z])
+
+        gravity_x = native_file_imu_frame.get_gravity_x()
+        gravity_y = native_file_imu_frame.get_gravity_y()
+        gravity_z = native_file_imu_frame.get_gravity_z()
+        self.gravity = np.array([gravity_x, gravity_y, gravity_z])
+
+
 class File:
     def __init__(self, native_file: NativeFile):
         with native_file.get_info() as info:
             self.info = FileInfo(info)
         with native_file.get_tracks() as tracks:
             self.tracks = FileTracks(tracks)
+
         self.video_frames = []
         video_frame_count = native_file.get_video_frame_count()
         for index in range(video_frame_count):
-            with native_file.get_video_frame(index) as file_video_frame:
-                self.video_frames.append(FileVideoFrame(file_video_frame))
+            with native_file.get_video_frame(index) as native_file_video_frame:
+                self.video_frames.append(FileVideoFrame(native_file_video_frame))
+
+        self.imu_frames = []
+        imu_frame_count = native_file.get_imu_frame_count()
+        for index in range(imu_frame_count):
+            with native_file.get_imu_frame(index) as native_file_imu_frame:
+                self.imu_frames.append(FileIMUFrame(native_file_imu_frame))
