@@ -1,19 +1,13 @@
 import platform
 import os
-import sys
 from pathlib import Path
-from pprint import pprint
 
 
 if platform.system() == "Windows":
     script_path = Path(__file__).parent.resolve()
-    dll_path = f"{script_path}\\librgbd-binaries\\1.3.0\\x64-windows\\bin"
-    print(f"dll_path: {dll_path}")
-    os.add_dll_directory(dll_path)
-    os.add_dll_directory("C:\\WINDOWS\\system32")
-    os.add_dll_directory("C:\\Python39")
-    sys.path.append(dll_path)
-    pprint(sys.path)
+    librgbd_dll_path = f"{script_path}\\librgbd-binaries\\1.3.0\\x64-windows\\bin"
+    print(f"librgbd_dll_path: {librgbd_dll_path}")
+    os.add_dll_directory(librgbd_dll_path)
 
 
 import pyrgbd as rgbd
