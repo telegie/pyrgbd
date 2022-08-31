@@ -42,7 +42,7 @@ def main():
 
     video_file_path = "tmp/example.mkv"
     if not os.path.exists(video_file_path):
-        video_id = rgbd.decode_base64url_to_long("YyjlJ9wEppo")
+        video_id = rgbd.decode_base64url_to_long("YVqrvHmHlmU")
         video_url = f"https://videos.telegie.com/v1/{video_id}/{video_id}.mkv"
         response = requests.get(video_url)
         with open(video_file_path, "wb") as file:
@@ -100,7 +100,11 @@ def main():
     cv2.imshow("bgr", bgr)
     cv2.imshow("depth", depth_array.astype(np.uint16))
 
+    for video_frame in file.video_frames:
+        print(f"video timecode: {video_frame.global_timecode}")
+
     for imu_frame in file.imu_frames:
+        print(f"timecode: {imu_frame.global_timecode}")
         print(f"gravity: {imu_frame.gravity}")
 
     points = []
