@@ -4,13 +4,13 @@ import os
 import platform
 
 
-def build_librgbd():
-    script_path = Path(__file__).parent.resolve()
+def bootstrap_librgbd():
+    here = Path(__file__).parent.resolve()
 
     ffi = FFI()
 
     if platform.system() == "Windows":
-        librgbd_path = f"{script_path}\\..\\librgbd-binaries\\1.3.0\\x64-windows"
+        librgbd_path = f"{here}\\librgbd-binaries\\1.3.0\\x64-windows"
         librgbd_include_dir = f"{librgbd_path}\\include"
         library_str = "rgbd-1"
         librgbd_library_dir = f"{librgbd_path}\\bin"
@@ -22,7 +22,7 @@ def build_librgbd():
                        library_dirs=[str(librgbd_library_dir)])
 
     elif platform.system() == "Darwin":
-        librgbd_path = f"{script_path}/../librgbd-binaries/1.3.0/arm64-mac"
+        librgbd_path = f"{here}/librgbd-binaries/1.3.0/arm64-mac"
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd-1"
         librgbd_library_dir = f"{librgbd_path}/bin"
@@ -36,7 +36,7 @@ def build_librgbd():
                        extra_link_args=[extra_link_args_str])
 
     elif platform.system() == "Linux":
-        librgbd_path = f"{script_path}/../librgbd-binaries/1.3.0/x64-linux"
+        librgbd_path = f"{here}/librgbd-binaries/1.3.0/x64-linux"
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd-1"
         librgbd_library_dir = f"{librgbd_path}/bin"
@@ -71,12 +71,12 @@ def build_librgbd():
             cdef_lines.append(line)
 
     ffi.cdef("".join(cdef_lines))
-    ffi.compile(verbose=True)
+    ffi.compile(tmpdir=f"{here}/pyrgbd")
     print(f"built librgbd")
 
 
 def main():
-    build_librgbd()
+    bootstrap_librgbd()
 
 
 if __name__ == "__main__":
