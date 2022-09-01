@@ -3,6 +3,7 @@ name = "pyrgbd"
 version = "0.1.0"
 description = ""
 authors = ["Hanseul Jun <hanseul@telegie.com>"]
+build = "build.py"
 
 [tool.poetry.dependencies]
 python = "^3.9.0"
@@ -16,4 +17,4 @@ vedo = "^2022.2.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
-build-backend = "setuptools.build_meta"
+build-backend = "poetry.masonry.api"

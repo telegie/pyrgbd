@@ -1,18 +1,35 @@
-from setuptools import setup, find_packages
-from pathlib import Path
+# -*- coding: utf-8 -*-
+from setuptools import setup
 
-print("setup.py start")
+packages = \
+['pyrgbd']
 
-py_modules = []
+package_data = \
+{'': ['*']}
 
-here = Path(__file__).parent.resolve()
-librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/arm64-mac/bin"
+install_requires = \
+['cffi>=1.15.1,<2.0.0',
+ 'numpy>=1.23.2,<2.0.0',
+ 'opencv-python>=4.6.0,<5.0.0',
+ 'requests>=2.28.1,<3.0.0',
+ 'vedo>=2022.2.3,<2023.0.0']
 
-print(f".so path: {here}/pyrgbd/_librgbd.cpython-39-darwin.so")
+setup_kwargs = {
+    'name': 'pyrgbd',
+    'version': '0.1.0',
+    'description': '',
+    'long_description': None,
+    'author': 'Hanseul Jun',
+    'author_email': 'hanseul@telegie.com',
+    'maintainer': None,
+    'maintainer_email': None,
+    'url': None,
+    'packages': packages,
+    'package_data': package_data,
+    'install_requires': install_requires,
+    'python_requires': '>=3.9.0,<4.0.0',
+}
+from build import *
+build(setup_kwargs)
 
-setup(
-    name="pyrgbd",
-    version="0.1.0",
-    packages=find_packages(where="pyrgbd"),
-    data_files=[("bin", [f"{librgbd_bin_dir}/librgbd-1.dylib", f"{here}/pyrgbd/_librgbd.cpython-39-darwin.so"])]
-)
+setup(**setup_kwargs)
