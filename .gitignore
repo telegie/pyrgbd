@@ -134,3 +134,6 @@ dmypy.json
 *.o
 *.dll
 pyrgbd/Release
+
+# Prebuilt binaries
+*.dylib

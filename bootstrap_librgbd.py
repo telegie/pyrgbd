@@ -2,9 +2,9 @@ from cffi import FFI
 from pathlib import Path
 import os
 import platform
+import shutil
 
-
-def bootstrap_librgbd():
+def compile_with_cffi():
     here = Path(__file__).parent.resolve()
 
     ffi = FFI()
@@ -26,7 +26,8 @@ def bootstrap_librgbd():
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd-1"
         librgbd_library_dir = f"{librgbd_path}/bin"
-        extra_link_args_str = f"-Wl,-rpath,{str(librgbd_library_dir)}"
+        # Add same directory in rpath to find the dylib in the same directory.
+        extra_link_args_str = f"-Wl,-rpath,{here}/pyrgbd"
 
         ffi.set_source('_librgbd',
                        r'#include <rgbd/rgbd_capi.h>',
@@ -71,8 +72,22 @@ def bootstrap_librgbd():
             cdef_lines.append(line)
 
     ffi.cdef("".join(cdef_lines))
+    # Output of the compilation goes to tmpdir.
     ffi.compile(tmpdir=f"{here}/pyrgbd")
-    print(f"built librgbd")
+
+
+def copy_prebuilt_binaries():
+    here = Path(__file__).parent.resolve()
+
+    if platform.system() == "Darwin":
+        librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/arm64-mac/bin"
+        shutil.copy(f"{librgbd_bin_dir}/librgbd-1.dylib", f"{here}/pyrgbd")
+
+
+def bootstrap_librgbd():
+    compile_with_cffi()
+    print(f"compile_with_cffi done")
+    copy_prebuilt_binaries()
 
 
 def main():
