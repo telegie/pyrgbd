@@ -39,6 +39,8 @@ def merge_yuv_arrays_to_bgr(y_array, u_array, v_array):
 
 
 def main():
+    print(f"TWO: {rgbd.get_number_two()}")
+    print(f"MAJOR: {rgbd.get_librgbd_major_version()}")
 
     video_file_path = "tmp/example.mkv"
     if not os.path.exists(video_file_path):

@@ -15,3 +15,9 @@ For the "pyconfig.h: No such file or directory" error:
  
 ImportError: libGL.so.1: cannot open shared object file: No such file or directory:
 - apt install libgl1
+
+## Notes on Packaging
+
+python -m build --wheel
+
+Not using poetry build since it only supports pure python packages (yet).

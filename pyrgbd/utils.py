@@ -1,6 +1,22 @@
 from ._librgbd import ffi, lib
 import base64
-import struct
+
+
+# This is for testing only.
+def get_number_two() -> int:
+    return 2
+
+
+def get_librgbd_major_version() -> int:
+    return lib.RGBD_MAJOR_VERSION()
+
+
+def get_librgbd_minor_version() -> int:
+    return lib.RGBD_MINOR_VERSION()
+
+
+def get_librgbd_patch_version() -> int:
+    return lib.RGBD_PATCH_VERSION()
 
 
 def cast_to_pointer(ptr):
