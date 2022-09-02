@@ -14,7 +14,7 @@ except ImportError:
 setup(
     name="pyrgbd",
     version="0.1.0",
-    install_requires=["cffi", "numpy"],
+    install_requires=["cffi", "numpy", "opencv-python"],
     packages=['pyrgbd'],
     # For files to be copied by package_data, they should exist inside the corresponding package's directory.
     package_data={
