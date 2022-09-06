@@ -44,15 +44,16 @@ def main():
     with rgbd.NativeFFmpegVideoDecoder() as color_decoder:
         for video_frame in file.video_frames:
             color_bytes = video_frame.color_bytes
-            with color_decoder.decode(rgbd.cast_to_pointer(color_bytes.ctypes.data), color_bytes.size) as native_yuv_frame:
-                color_array = rgbd.convert_native_yuv_frame_to_color_array(native_yuv_frame)
+            with color_decoder.decode(rgbd.cast_np_array_to_pointer(color_bytes), color_bytes.size) as native_yuv_frame:
+                yuv_frame = rgbd.YuvFrame(native_yuv_frame)
+                color_array = rgbd.convert_yuv420_to_rgb(yuv_frame.y_channel, yuv_frame.u_channel, yuv_frame.v_channel)
                 color_arrays.append(color_array)
 
     depth_arrays = []
     with rgbd.NativeDepthDecoder() as depth_decoder:
         for video_frame in file.video_frames:
             depth_bytes = video_frame.depth_bytes
-            with depth_decoder.decode(rgbd.cast_to_pointer(depth_bytes.ctypes.data), depth_bytes.size) as native_depth_frame:
+            with depth_decoder.decode(rgbd.cast_np_array_to_pointer(depth_bytes), depth_bytes.size) as native_depth_frame:
                 depth_array = rgbd.convert_native_int32_frame_to_depth_array(native_depth_frame)
                 depth_arrays.append(depth_array)
 

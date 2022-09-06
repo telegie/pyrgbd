@@ -1,5 +1,6 @@
 from ._librgbd import ffi, lib
 from .capi_containers import NativeUInt8Array, NativeInt32Array
+import numpy as np
 
 class NativeYuvFrame:
     def __init__(self, ptr):
@@ -51,3 +52,18 @@ class NativeInt32Frame:
 
     def get_values(self) -> NativeInt32Array:
         return NativeInt32Array(lib.rgbd_int32_frame_get_values(self.ptr))
+
+
+class YuvFrame:
+    def __init__(self, native_yuv_frame: NativeYuvFrame):
+        self.width = native_yuv_frame.get_width()
+        self.height = native_yuv_frame.get_height()
+
+        y_channel = native_yuv_frame.get_y_channel().to_np_array()
+        self.y_channel = y_channel.reshape((self.height, self.width))
+
+        u_channel = native_yuv_frame.get_u_channel().to_np_array()
+        self.u_channel = u_channel.reshape((self.height // 2, self.width // 2))
+
+        v_channel = native_yuv_frame.get_v_channel().to_np_array()
+        self.v_channel = v_channel.reshape((self.height // 2, self.width // 2))

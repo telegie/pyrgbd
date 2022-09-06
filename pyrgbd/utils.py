@@ -4,7 +4,7 @@ import io
 import cv2
 import numpy as np
 from .file import NativeFile
-from .frame import NativeYuvFrame, NativeInt32Frame
+from .frame import NativeYuvFrame, NativeInt32Frame, YuvFrame
 
 
 # This is for testing only.
@@ -24,8 +24,8 @@ def get_librgbd_patch_version() -> int:
     return lib.RGBD_PATCH_VERSION()
 
 
-def cast_to_pointer(ptr):
-    return ffi.cast("void*", ptr)
+def cast_np_array_to_pointer(np_array: np.array):
+    return ffi.cast("void*", np_array.ctypes.data)
 
 
 def decode_base64url_to_long(s: str):
@@ -74,23 +74,7 @@ def get_calibration_directions(native_file: NativeFile) -> np.ndarray:
     return directions
 
 
-def convert_native_yuv_frame_to_color_array(native_yuv_frame: NativeYuvFrame):
-    width = native_yuv_frame.get_width()
-    height = native_yuv_frame.get_height()
-    with native_yuv_frame.get_y_channel() as y_channel:
-        y_array = y_channel.to_np_array()
-        y_array = y_array.reshape((height, width))
-    with native_yuv_frame.get_u_channel() as u_channel:
-        u_array = u_channel.to_np_array()
-        u_array = u_array.reshape((height // 2, width // 2))
-    with native_yuv_frame.get_v_channel() as v_channel:
-        v_array = v_channel.to_np_array()
-        v_array = v_array.reshape((height // 2, width // 2))
-
-    return convert_yuv420_to_rgb(y_array, u_array, v_array)
-
-
-def convert_native_int32_frame_to_depth_array(native_int32_frame: NativeInt32Frame):
+def convert_native_int32_frame_to_depth_array(native_int32_frame: NativeInt32Frame) -> np.array:
     width = native_int32_frame.get_width()
     height = native_int32_frame.get_height()
     depth_array = native_int32_frame.get_values().to_np_array()
