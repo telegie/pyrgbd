@@ -113,6 +113,18 @@ class NativeFileVideoFrame:
     def get_depth_bytes(self) -> NativeByteArray:
         return NativeByteArray(lib.rgbd_file_video_frame_get_depth_bytes(self.ptr))
 
+    def get_floor_normal_x(self) -> float:
+        return lib.rgbd_file_video_frame_get_floor_normal_x(self.ptr)
+
+    def get_floor_normal_y(self) -> float:
+        return lib.rgbd_file_video_frame_get_floor_normal_y(self.ptr)
+
+    def get_floor_normal_z(self) -> float:
+        return lib.rgbd_file_video_frame_get_floor_normal_z(self.ptr)
+
+    def get_floor_constant(self) -> float:
+        return lib.rgbd_file_video_frame_get_floor_constant(self.ptr)
+
 
 class NativeFileIMUFrame:
     def __init__(self, ptr, owner: bool):
@@ -231,6 +243,10 @@ class FileVideoFrame:
             self.color_bytes = color_bytes.to_np_array()
         with native_file_video_frame.get_depth_bytes() as depth_bytes:
             self.depth_bytes = depth_bytes.to_np_array()
+        self.floor_normal_x = native_file_video_frame.get_floor_normal_x()
+        self.floor_normal_y = native_file_video_frame.get_floor_normal_y()
+        self.floor_normal_z = native_file_video_frame.get_floor_normal_z()
+        self.floor_constant = native_file_video_frame.get_floor_constant()
 
 
 class FileIMUFrame:
