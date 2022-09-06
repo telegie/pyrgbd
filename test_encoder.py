@@ -10,9 +10,7 @@ if platform.system() == "Windows":
     os.add_dll_directory(librgbd_dll_path)
 
 
-print("before import pyrgbd")
 import pyrgbd as rgbd
-print("after import pyrgbd")
 import cv2
 import numpy as np
 import requests
@@ -59,31 +57,9 @@ def main():
     # cv2.imshow("color", rgb)
     cv2.imshow("depth", depth_arrays[0].astype(np.uint16))
 
-    # for video_frame in file.video_frames:
-    #     print(f"video timecode: {video_frame.global_timecode}")
-    #
-    # for imu_frame in file.imu_frames:
-    #     print(f"timecode: {imu_frame.global_timecode}")
-    #     print(f"gravity: {imu_frame.gravity}")
-
-    points = []
-    colors = []
-    step = color_track.width / depth_track.width
-    for row in range(depth_track.height):
-        for col in range(depth_track.width):
-            direction = directions[row][col]
-            depth = depth_array[row][col]
-            points.append(direction * depth * 0.001)
-
-            color = color_arrays[0][int(row * step)][int(col * step)]
-            # flip bgr to rgb
-            color = np.array([color[0], color[1], color[2]])
-            colors.append(color)
-
-    points = np.array(points)
-    colors = np.array(colors)
-    points = vedo.Points(points, c=colors)
-    vedo.show(points)
+    print("before encoder")
+    encoder = rgbd.NativeFFmpegVideoEncoder(720, 480, 2500, 30)
+    print("after encoder")
 
     cv2.waitKey(0)
 
