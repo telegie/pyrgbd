@@ -6,7 +6,7 @@
 - poetry shell
 - poetry install
 
-Run "python pyrgbd/build_librgbd.py" to build the binary files needed for pyrgbd to operate.
+Run "python bootstrap_librgbd.py" to build the binary files needed for pyrgbd to operate.
 
 ## Notes for Ubuntu
 
