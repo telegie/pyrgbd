@@ -79,6 +79,15 @@ def compile_with_cffi():
 def copy_prebuilt_binaries():
     here = Path(__file__).parent.resolve()
 
+    if platform.system() == "Windows":
+        librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/x64-windows/bin"
+        dll_files = ["avcodec-58.dll", "avutil-56.dll", "libwinpthread-1.dll", "rgbd-1.dll", "zlib1.dll"]
+        for dll_file in dll_files:
+            destination = f"{here}/pyrgbd/{dll_file}"
+            if os.path.exists(destination):
+                os.remove(destination)
+            shutil.copy(f"{librgbd_bin_dir}/{dll_file}", destination)
+
     if platform.system() == "Darwin":
         librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/arm64-mac/bin"
         destination = f"{here}/pyrgbd/librgbd-1.dylib"

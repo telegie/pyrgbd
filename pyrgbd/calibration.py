@@ -1,6 +1,4 @@
-print("before import ._librgbd")
 from ._librgbd import ffi, lib
-print("after import ._librgbd")
 from .capi_containers import NativeFloatArray
 
 

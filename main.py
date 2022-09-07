@@ -1,18 +1,4 @@
-import platform
-import os
-from pathlib import Path
-
-
-if platform.system() == "Windows":
-    script_path = Path(__file__).parent.resolve()
-    librgbd_dll_path = f"{script_path}\\librgbd-binaries\\1.3.0\\x64-windows\\bin"
-    print(f"librgbd_dll_path: {librgbd_dll_path}")
-    os.add_dll_directory(librgbd_dll_path)
-
-
-print("before import pyrgbd")
 import pyrgbd as rgbd
-print("after import pyrgbd")
 import cv2
 import numpy as np
 import requests
