@@ -7,9 +7,7 @@ import vedo
 
 
 def main():
-    print(f"TWO: {rgbd.get_number_two()}")
-    print(f"MAJOR: {rgbd.get_librgbd_major_version()}")
-
+    # Download file from server.
     video_file_path = "tmp/example.mkv"
     if not os.path.exists(video_file_path):
         video_id = rgbd.decode_base64url_to_long("YVqrvHmHlmU")
@@ -18,6 +16,7 @@ def main():
         with open(video_file_path, "wb") as file:
             file.write(response.content)
 
+    # Extract information from the downloaded file.
     with rgbd.NativeFileParser(video_file_path) as native_file_parser:
         with native_file_parser.parse_all_frames() as native_file:
             file = rgbd.File(native_file)
@@ -26,6 +25,7 @@ def main():
     color_track = file.tracks.color_track
     depth_track = file.tracks.depth_track
 
+    # Decode color frames.
     color_arrays = []
     with rgbd.NativeFFmpegVideoDecoder() as color_decoder:
         for video_frame in file.video_frames:
@@ -35,6 +35,7 @@ def main():
                 color_array = rgbd.convert_yuv420_to_rgb(yuv_frame.y_channel, yuv_frame.u_channel, yuv_frame.v_channel)
                 color_arrays.append(color_array)
 
+    # Decode depth frames.
     depth_arrays = []
     with rgbd.NativeDepthDecoder(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1) as depth_decoder:
         for video_frame in file.video_frames:
@@ -53,6 +54,7 @@ def main():
     #     print(f"timecode: {imu_frame.global_timecode}")
     #     print(f"gravity: {imu_frame.gravity}")
 
+    # Render things.
     points = []
     colors = []
     step = color_track.width / depth_track.width

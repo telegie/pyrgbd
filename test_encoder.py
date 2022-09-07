@@ -1,13 +1,3 @@
-import platform
-import os
-from pathlib import Path
-
-if platform.system() == "Windows":
-    script_path = Path(__file__).parent.resolve()
-    librgbd_dll_path = f"{script_path}\\librgbd-binaries\\1.3.0\\x64-windows\\bin"
-    print(f"librgbd_dll_path: {librgbd_dll_path}")
-    os.add_dll_directory(librgbd_dll_path)
-
 import pyrgbd as rgbd
 import cv2
 import numpy as np
@@ -69,7 +59,6 @@ def main():
 
     depth_width = depth_arrays[0].shape[0]
     depth_height = depth_arrays[0].shape[1]
-
 
     with rgbd.NativeFFmpegVideoEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8, yuv_frame.width, yuv_frame.height, 2500,
                                        30) as color_encoder, \
