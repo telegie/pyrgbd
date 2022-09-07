@@ -36,7 +36,7 @@ def main():
                 color_arrays.append(color_array)
 
     depth_arrays = []
-    with rgbd.NativeDepthDecoder() as depth_decoder:
+    with rgbd.NativeDepthDecoder(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1) as depth_decoder:
         for video_frame in file.video_frames:
             depth_bytes = video_frame.depth_bytes
             with depth_decoder.decode(rgbd.cast_np_array_to_pointer(depth_bytes), depth_bytes.size) as native_depth_frame:

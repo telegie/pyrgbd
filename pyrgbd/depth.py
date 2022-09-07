@@ -5,10 +5,8 @@ import numpy as np
 
 
 class NativeDepthDecoder:
-    def __init__(self):
-        # Setting 1 assuming TDC1.
-        # Fix this later.
-        self.ptr = lib.rgbd_depth_decoder_ctor(1)
+    def __init__(self, depth_codec_type):
+        self.ptr = lib.rgbd_depth_decoder_ctor(depth_codec_type)
 
     def close(self):
         lib.rgbd_depth_decoder_dtor(self.ptr)
@@ -25,10 +23,16 @@ class NativeDepthDecoder:
 
 
 class NativeDepthEncoder:
-    def __init__(self, width: int, height: int):
-        # Assuming TDC1.
-        # Fix this later.
-        self.ptr = lib.rgbd_depth_encoder_create_rvl_encoder(width, height)
+    def __init__(self, ptr):
+        self.ptr = ptr
+
+    @staticmethod
+    def create_rvl_encoder(width: int, height: int):
+        return NativeDepthEncoder(lib.rgbd_depth_encoder_create_rvl_encoder(width, height))
+
+    @staticmethod
+    def create_tdc1_encoder(width: int, height: int, depth_diff_multiplier: int):
+        return NativeDepthEncoder(lib.rgbd_depth_encoder_create_tdc1_encoder(width, height, depth_diff_multiplier))
 
     def close(self):
         lib.rgbd_depth_encoder_dtor(self.ptr)

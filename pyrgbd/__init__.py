@@ -4,5 +4,6 @@ from .depth import *
 from .ffmpeg import *
 from .file import *
 from .file_parser import *
+from .file_writer import *
 from .frame import *
 from .utils import *
