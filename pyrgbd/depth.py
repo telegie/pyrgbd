@@ -1,5 +1,8 @@
 from ._librgbd import ffi, lib
 from .frame import NativeInt32Frame
+from .capi_containers import NativeByteArray
+import numpy as np
+
 
 class NativeDepthDecoder:
     def __init__(self):
@@ -36,5 +39,6 @@ class NativeDepthEncoder:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def encode(self, depth_values_data, depth_values_size: int, keyframe: bool):
-        lib.rgbd_depth_encoder_encode(self.ptr, depth_values_data, depth_values_size, keyframe)
+    def encode(self, depth_values_data, depth_values_size: int, keyframe: bool) -> np.array:
+        return NativeByteArray(
+            lib.rgbd_depth_encoder_encode(self.ptr, depth_values_data, depth_values_size, keyframe)).to_np_array()

@@ -2,13 +2,11 @@ import platform
 import os
 from pathlib import Path
 
-
 if platform.system() == "Windows":
     script_path = Path(__file__).parent.resolve()
     librgbd_dll_path = f"{script_path}\\librgbd-binaries\\1.3.0\\x64-windows\\bin"
     print(f"librgbd_dll_path: {librgbd_dll_path}")
     os.add_dll_directory(librgbd_dll_path)
-
 
 import pyrgbd as rgbd
 import cv2
@@ -53,29 +51,35 @@ def main():
     with rgbd.NativeDepthDecoder() as depth_decoder:
         for video_frame in file.video_frames:
             depth_bytes = video_frame.depth_bytes
-            with depth_decoder.decode(rgbd.cast_np_array_to_pointer(depth_bytes), depth_bytes.size) as native_depth_frame:
+            with depth_decoder.decode(rgbd.cast_np_array_to_pointer(depth_bytes),
+                                      depth_bytes.size) as native_depth_frame:
                 depth_array = rgbd.convert_native_int32_frame_to_depth_array(native_depth_frame)
                 depth_arrays.append(depth_array)
 
     # cv2.imshow("color", rgb)
     cv2.imshow("depth", depth_arrays[0].astype(np.uint16))
 
-    with rgbd.NativeFFmpegVideoEncoder(yuv_frame.width, yuv_frame.height, 2500, 30) as color_encoder:
-        for yuv_frame in yuv_frames:
-            color_encoder.encode(rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
-                                 yuv_frame.y_channel.size,
-                                 rgbd.cast_np_array_to_pointer(yuv_frame.u_channel),
-                                 yuv_frame.u_channel.size,
-                                 rgbd.cast_np_array_to_pointer(yuv_frame.v_channel),
-                                 yuv_frame.v_channel.size,
-                                 True)
-
     depth_width = depth_arrays[0].shape[0]
     depth_height = depth_arrays[0].shape[1]
 
-    with rgbd.NativeDepthEncoder(depth_width, depth_height) as depth_encoder:
-        for depth_array in depth_arrays:
-            depth_encoder.encode(rgbd.cast_np_array_to_pointer(depth_array), depth_array.size, True)
+    with rgbd.NativeFFmpegVideoEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8, yuv_frame.width, yuv_frame.height, 2500,
+                                       30) as color_encoder, \
+            rgbd.NativeDepthEncoder(depth_width, depth_height) as depth_encoder:
+        for index in range(len(file.video_frames)):
+            video_frame = file.video_frames[index]
+            yuv_frame = yuv_frames[index]
+            depth_array = depth_arrays[index]
+            color_encoder_frame = color_encoder.encode(rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
+                                                       yuv_frame.y_channel.size,
+                                                       rgbd.cast_np_array_to_pointer(yuv_frame.u_channel),
+                                                       yuv_frame.u_channel.size,
+                                                       rgbd.cast_np_array_to_pointer(yuv_frame.v_channel),
+                                                       yuv_frame.v_channel.size,
+                                                       True)
+            depth_encoder_frame = depth_encoder.encode(rgbd.cast_np_array_to_pointer(depth_array), depth_array.size,
+                                                       True)
+            color_encoder_frame.get_packet().get_data_bytes()
+            print(f"depth_encoder_frame.shape: {depth_encoder_frame.shape}")
 
     cv2.waitKey(0)
 

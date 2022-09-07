@@ -81,7 +81,12 @@ def copy_prebuilt_binaries():
 
     if platform.system() == "Darwin":
         librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/arm64-mac/bin"
-        shutil.copy(f"{librgbd_bin_dir}/librgbd-1.dylib", f"{here}/pyrgbd")
+        destination = f"{here}/pyrgbd/librgbd-1.dylib"
+        # Should remove the existing one before copying.
+        # Simply copying does not overwrite properly.
+        if os.path.exists(destination):
+            os.remove(destination)
+        shutil.copy(f"{librgbd_bin_dir}/librgbd-1.dylib", destination)
 
 
 def bootstrap_librgbd():
