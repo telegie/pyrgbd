@@ -4,14 +4,11 @@
 
 ### For Linux
 
-- add-apt-repository ppa:deadsnakes/ppa
-- apt install python3.9-dev
-- apt install python3.9-distutils
+- apt install python3.10-distutils
 - apt install libgl1
 
 ### General
 
-- poetry env use python3.9 (Unfortunately, vtk does not support Python 3.10 yet...)
 - poetry shell
 - poetry install
 

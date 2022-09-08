@@ -44,7 +44,7 @@ def main():
                 depth_array = rgbd.convert_native_int32_frame_to_depth_array(native_depth_frame)
                 depth_arrays.append(depth_array)
 
-    # cv2.imshow("color", rgb)
+    cv2.imshow("color", cv2.cvtColor(color_arrays[0], cv2.COLOR_RGB2BGR))
     cv2.imshow("depth", depth_arrays[0].astype(np.uint16))
 
     # for video_frame in file.video_frames:
