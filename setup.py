@@ -18,7 +18,7 @@ setup(
     packages=['pyrgbd'],
     # For files to be copied by package_data, they should exist inside the corresponding package's directory.
     package_data={
-        'pyrgbd': ["_librgbd.cpython-39-darwin.so", "librgbd-1.dylib"]
+        'pyrgbd': ["_librgbd.cpython-310-darwin.so", "librgbd-1.dylib"]
     },
     cmdclass={'bdist_wheel': bdist_wheel}
 )

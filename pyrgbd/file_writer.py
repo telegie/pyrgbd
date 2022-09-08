@@ -21,6 +21,13 @@ class NativeFileWriter:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
+    def write_cover(self, width: int, height: int,
+                    y_channel, y_channel_size: int,
+                    u_channel, u_channel_size: int,
+                    v_channel, v_channel_size: int):
+        lib.rgbd_file_writer_write_cover(self.ptr, width, height, y_channel, y_channel_size, u_channel, u_channel_size,
+                                         v_channel, v_channel_size)
+
     def write_video_frame(self, time_point_us: int,
                           color_bytes, color_byte_size: int,
                           depth_bytes, depth_byte_size: int,
