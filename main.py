@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import requests
 import os.path
-import vedo
+# import vedo
 
 
 def main():
@@ -55,24 +55,24 @@ def main():
     #     print(f"gravity: {imu_frame.gravity}")
 
     # Render things.
-    points = []
-    colors = []
-    step = color_track.width / depth_track.width
-    for row in range(depth_track.height):
-        for col in range(depth_track.width):
-            direction = directions[row][col]
-            depth = depth_array[row][col]
-            points.append(direction * depth * 0.001)
-
-            color = color_arrays[0][int(row * step)][int(col * step)]
-            # flip bgr to rgb
-            color = np.array([color[0], color[1], color[2]])
-            colors.append(color)
-
-    points = np.array(points)
-    colors = np.array(colors)
-    points = vedo.Points(points, c=colors)
-    vedo.show(points)
+    # points = []
+    # colors = []
+    # step = color_track.width / depth_track.width
+    # for row in range(depth_track.height):
+    #     for col in range(depth_track.width):
+    #         direction = directions[row][col]
+    #         depth = depth_array[row][col]
+    #         points.append(direction * depth * 0.001)
+    #
+    #         color = color_arrays[0][int(row * step)][int(col * step)]
+    #         # flip bgr to rgb
+    #         color = np.array([color[0], color[1], color[2]])
+    #         colors.append(color)
+    #
+    # points = np.array(points)
+    # colors = np.array(colors)
+    # points = vedo.Points(points, c=colors)
+    # vedo.show(points)
 
     cv2.waitKey(0)
 
