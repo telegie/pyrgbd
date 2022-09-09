@@ -90,6 +90,11 @@ def main():
                                           video_frame.floor_normal_z,
                                           video_frame.floor_constant)
 
+    for audio_frame in file.audio_frames:
+        file_writer.write_audio_frame(audio_frame.global_timecode,
+                                      rgbd.cast_np_array_to_pointer(audio_frame.bytes),
+                                      audio_frame.bytes.size)
+
     file_writer.flush()
 
     cv2.waitKey(0)

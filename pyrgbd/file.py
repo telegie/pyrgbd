@@ -126,6 +126,28 @@ class NativeFileVideoFrame:
         return lib.rgbd_file_video_frame_get_floor_constant(self.ptr)
 
 
+class NativeFileAudioFrame:
+    def __init__(self, ptr, owner: bool):
+        self.ptr = ptr
+        self.owner = owner
+
+    def close(self):
+        if self.owner:
+            lib.rgbd_file_audio_frame_dtor(self.ptr)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def get_global_timecode(self) -> int:
+        return lib.rgbd_file_audio_frame_get_global_timecode(self.ptr)
+
+    def get_bytes(self) -> NativeByteArray:
+        return NativeByteArray(lib.rgbd_file_audio_frame_get_bytes(self.ptr))
+
+
 class NativeFileIMUFrame:
     def __init__(self, ptr, owner: bool):
         self.ptr = ptr
@@ -209,6 +231,12 @@ class NativeFile:
     def get_video_frame(self, index: int) -> NativeFileVideoFrame:
         return NativeFileVideoFrame(lib.rgbd_file_get_video_frame(self.ptr, index), False)
 
+    def get_audio_frame_count(self) -> int:
+        return lib.rgbd_file_get_audio_frame_count(self.ptr)
+
+    def get_audio_frame(self, index: int) -> NativeFileAudioFrame:
+        return NativeFileAudioFrame(lib.rgbd_file_get_audio_frame(self.ptr, index), False)
+
     def get_imu_frame_count(self) -> int:
         return lib.rgbd_file_get_imu_frame_count(self.ptr)
 
@@ -249,6 +277,13 @@ class FileVideoFrame:
         self.floor_constant = native_file_video_frame.get_floor_constant()
 
 
+class FileAudioFrame:
+    def __init__(self, native_file_audio_frame: NativeFileAudioFrame):
+        self.global_timecode = native_file_audio_frame.get_global_timecode()
+        with native_file_audio_frame.get_bytes() as audio_bytes:
+            self.bytes = audio_bytes.to_np_array()
+
+
 class FileIMUFrame:
     def __init__(self, native_file_imu_frame: NativeFileIMUFrame):
         self.global_timecode = native_file_imu_frame.get_global_timecode()
@@ -286,6 +321,12 @@ class File:
         for index in range(video_frame_count):
             with native_file.get_video_frame(index) as native_file_video_frame:
                 self.video_frames.append(FileVideoFrame(native_file_video_frame))
+
+        self.audio_frames = []
+        audio_frame_count = native_file.get_audio_frame_count()
+        for index in range(audio_frame_count):
+            with native_file.get_audio_frame(index) as native_file_audio_frame:
+                self.audio_frames.append(FileAudioFrame(native_file_audio_frame))
 
         self.imu_frames = []
         imu_frame_count = native_file.get_imu_frame_count()

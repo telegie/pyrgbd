@@ -38,5 +38,8 @@ class NativeFileWriter:
                                                depth_confidence_values, depth_confidence_values_size,
                                                floor_normal_x, floor_normal_y, floor_normal_z, floor_constant)
 
+    def write_audio_frame(self, time_point_us: int, audio_bytes, audio_byte_size: int):
+        lib.rgbd_file_writer_write_audio_frame(self.ptr, time_point_us, audio_bytes, audio_byte_size)
+
     def flush(self):
         lib.rgbd_file_writer_flush(self.ptr)
