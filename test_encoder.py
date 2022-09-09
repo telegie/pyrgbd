@@ -59,11 +59,23 @@ def main():
     depth_width = depth_arrays[0].shape[0]
     depth_height = depth_arrays[0].shape[1]
 
+    audio_frame_index = 0
     with rgbd.NativeFFmpegVideoEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8, yuv_frame.width, yuv_frame.height, 2500,
                                        30) as color_encoder, \
             rgbd.NativeDepthEncoder.create_tdc1_encoder(depth_width, depth_height, 500) as depth_encoder:
         for index in range(len(file.video_frames)):
             video_frame = file.video_frames[index]
+
+            # Write audio frames fitting in front of the video frame.
+            while audio_frame_index < len(file.audio_frames):
+                audio_frame = file.audio_frames[audio_frame_index]
+                if audio_frame.global_timecode > video_frame.global_timecode:
+                    break
+                file_writer.write_audio_frame(audio_frame.global_timecode,
+                                              rgbd.cast_np_array_to_pointer(audio_frame.bytes),
+                                              audio_frame.bytes.size)
+                audio_frame_index = audio_frame_index + 1
+
             yuv_frame = yuv_frames[index]
             depth_array = depth_arrays[index]
             color_encoder_frame = color_encoder.encode(rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
@@ -89,11 +101,6 @@ def main():
                                           video_frame.floor_normal_y,
                                           video_frame.floor_normal_z,
                                           video_frame.floor_constant)
-
-    for audio_frame in file.audio_frames:
-        file_writer.write_audio_frame(audio_frame.global_timecode,
-                                      rgbd.cast_np_array_to_pointer(audio_frame.bytes),
-                                      audio_frame.bytes.size)
 
     file_writer.flush()
 
