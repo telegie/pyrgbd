@@ -41,7 +41,7 @@ def compile_with_cffi():
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd-1"
         librgbd_library_dir = f"{librgbd_path}/bin"
-        extra_link_args_str = f"-Wl,-rpath,{str(librgbd_library_dir)}"
+        extra_link_args_str = f"-Wl,-rpath,{here}/pyrgbd"
 
         ffi.set_source('_librgbd',
                        r'#include <rgbd/rgbd_capi.h>',
@@ -96,6 +96,15 @@ def copy_prebuilt_binaries():
         if os.path.exists(destination):
             os.remove(destination)
         shutil.copy(f"{librgbd_bin_dir}/librgbd-1.dylib", destination)
+
+    if platform.system() == "Linux":
+        librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/x64-linux/bin"
+        destination = f"{here}/pyrgbd/librgbd-1.so"
+        # Should remove the existing one before copying.
+        # Simply copying does not overwrite properly.
+        if os.path.exists(destination):
+            os.remove(destination)
+        shutil.copy(f"{librgbd_bin_dir}/librgbd-1.so", destination)
 
 
 def bootstrap_librgbd():
