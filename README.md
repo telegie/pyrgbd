@@ -4,12 +4,13 @@
 
 ### For Linux
 
-- apt install python3.10-distutils
-- apt install libgl1
+- add-apt-repository ppa:deadsnakes/ppa
+- apt install python3.9-dev python3.9-distutils libgl1 python3-venv python3-cachecontrol
 
 ### General
 
 - poetry shell
+- pip install -U setuptools
 - poetry install
 
 Run "python bootstrap_librgbd.py" to build the binary files needed for pyrgbd to operate.
