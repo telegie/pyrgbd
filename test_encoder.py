@@ -21,17 +21,27 @@ def main():
         with native_file_parser.parse_all_frames() as native_file:
             file = rgbd.File(native_file)
             directions = rgbd.get_calibration_directions(native_file)
-            with native_file.get_attachments() as native_attachments:
-                with native_attachments.get_camera_calibration() as native_calibration:
-                    file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
-                                                        False,
-                                                        native_calibration,
-                                                        30,
-                                                        rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1,
-                                                        rgbd.lib.RGBD_AUDIO_SAMPLE_RATE())
+            # with native_file.get_attachments() as native_attachments:
+            #     with native_attachments.get_camera_calibration() as native_calibration:
+            #         file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
+            #                                             False,
+            #                                             native_calibration,
+            #                                             30,
+            #                                             rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1,
+            #                                             rgbd.lib.RGBD_AUDIO_SAMPLE_RATE())
 
     color_track = file.tracks.color_track
     depth_track = file.tracks.depth_track
+
+    with rgbd.create_native_undistorted_camera_calibration(color_track.width, color_track.height,
+                                                           depth_track.width, depth_track.height,
+                                                           0.5, -1.0, 0.5, 0.5) as native_calibration:
+        file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
+                                            False,
+                                            native_calibration,
+                                            30,
+                                            rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1,
+                                            rgbd.lib.RGBD_AUDIO_SAMPLE_RATE())
 
     yuv_frames = []
     color_arrays = []
@@ -56,8 +66,10 @@ def main():
     # cv2.imshow("color", rgb)
     cv2.imshow("depth", depth_arrays[0].astype(np.uint16))
 
-    depth_width = depth_arrays[0].shape[0]
-    depth_height = depth_arrays[0].shape[1]
+    depth_width = depth_arrays[0].shape[1]
+    depth_height = depth_arrays[0].shape[0]
+
+    print(f"depth_width: {depth_width}, depth_height: {depth_height}")
 
     audio_frame_index = 0
     with rgbd.NativeFFmpegVideoEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8, yuv_frame.width, yuv_frame.height, 2500,
@@ -77,6 +89,16 @@ def main():
                 audio_frame_index = audio_frame_index + 1
 
             yuv_frame = yuv_frames[index]
+
+            if index == 0:
+                file_writer.write_cover(yuv_frame.width, yuv_frame.height,
+                                        rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
+                                        yuv_frame.y_channel.size,
+                                        rgbd.cast_np_array_to_pointer(yuv_frame.u_channel),
+                                        yuv_frame.u_channel.size,
+                                        rgbd.cast_np_array_to_pointer(yuv_frame.v_channel),
+                                        yuv_frame.v_channel.size)
+
             depth_array = depth_arrays[index]
             color_encoder_frame = color_encoder.encode(rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
                                                        yuv_frame.y_channel.size,
@@ -103,8 +125,6 @@ def main():
                                           video_frame.floor_constant)
 
     file_writer.flush()
-
-    cv2.waitKey(0)
 
 
 if __name__ == "__main__":
