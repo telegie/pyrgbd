@@ -64,7 +64,7 @@ def main():
                 depth_arrays.append(depth_array)
 
     # cv2.imshow("color", rgb)
-    cv2.imshow("depth", depth_arrays[0].astype(np.uint16))
+    # cv2.imshow("depth", depth_arrays[0].astype(np.uint16))
 
     depth_width = depth_arrays[0].shape[1]
     depth_height = depth_arrays[0].shape[0]
