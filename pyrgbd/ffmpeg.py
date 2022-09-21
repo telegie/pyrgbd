@@ -78,13 +78,9 @@ class NativeFFmpegVideoEncoder:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def encode(self, y_channel, y_channel_size, u_channel, u_channel_size, v_channel, v_channel_size,
-               keyframe) -> NativeFFmpegVideoEncoderFrame:
+    def encode(self, y_channel, u_channel, v_channel, keyframe) -> NativeFFmpegVideoEncoderFrame:
         return NativeFFmpegVideoEncoderFrame(lib.rgbd_ffmpeg_video_encoder_encode(self.ptr,
                                                                                   y_channel,
-                                                                                  y_channel_size,
                                                                                   u_channel,
-                                                                                  u_channel_size,
                                                                                   v_channel,
-                                                                                  v_channel_size,
                                                                                   keyframe))

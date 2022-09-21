@@ -101,11 +101,8 @@ def main():
 
             depth_array = depth_arrays[index]
             color_encoder_frame = color_encoder.encode(rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
-                                                       yuv_frame.y_channel.size,
                                                        rgbd.cast_np_array_to_pointer(yuv_frame.u_channel),
-                                                       yuv_frame.u_channel.size,
                                                        rgbd.cast_np_array_to_pointer(yuv_frame.v_channel),
-                                                       yuv_frame.v_channel.size,
                                                        True)
             color_bytes = color_encoder_frame.get_packet().get_data_bytes()
             depth_bytes = depth_encoder.encode(rgbd.cast_np_array_to_pointer(depth_array), depth_array.size, True)
