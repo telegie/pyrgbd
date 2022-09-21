@@ -75,9 +75,10 @@ def main():
     # vedo.show(points)
 
     direction_xs = directions[:, :, 0].squeeze()
-    cv2.imshow("Direction X", np.absolute(direction_xs * 100000).astype(np.uint16))
+    cv2.imshow("Direction X", np.absolute(direction_xs * 10000).astype(np.uint16))
 
     direction_x_diffs = np.diff(direction_xs, axis=1)
+    # cv2.imshow("Direction X Diff", np.absolute(direction_x_diffs * 10000000).astype(np.uint16))
     direction_x_diffs_delta = direction_x_diffs - np.mean(direction_x_diffs)
     cv2.imshow("Direction X Diff Delta", np.absolute(direction_x_diffs_delta * 1000000000).astype(np.uint16))
 
