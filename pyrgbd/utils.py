@@ -55,6 +55,21 @@ def convert_yuv420_to_rgb(y_array: np.ndarray, u_array: np.ndarray, v_array: np.
     return cv2.cvtColor(yuv_data, cv2.COLOR_YUV2RGB_I420)
 
 
+def convert_rgb_to_yuv420(rgb_array: np.ndarray):
+    rgb_width = rgb_array.shape[1]
+    rgb_height = rgb_array.shape[0]
+    yuv_array = cv2.cvtColor(rgb_array, cv2.COLOR_RGB2YUV_I420)
+
+    y_array = yuv_array[0:rgb_height, :]
+    u_array = yuv_array[rgb_height:rgb_height * 5 // 4, :]
+    v_array = yuv_array[rgb_height * 5 // 4:rgb_height * 6 // 4, :]
+
+    u_array = np.reshape(u_array, (rgb_height // 2, rgb_width // 2))
+    v_array = np.reshape(v_array, (rgb_height // 2, rgb_width // 2))
+
+    return y_array, u_array, v_array
+
+
 def get_calibration_directions(native_file: NativeFile) -> np.ndarray:
     # Get directions array from the native_camera_calibration.
     # native_camera_calibration should be GC'ed here while directions will be needed.
