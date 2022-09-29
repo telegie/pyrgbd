@@ -1,5 +1,5 @@
 from ._librgbd import ffi, lib
-from pyrgbd import file as rgbd_file
+from . import file as rgbd_file
 
 
 class NativeFileParser:
