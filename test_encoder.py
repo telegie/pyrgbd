@@ -32,16 +32,16 @@ def main():
 
     color_track = file.tracks.color_track
     depth_track = file.tracks.depth_track
+    print(f"depth_track.depth_unit: {depth_track.depth_unit}")
 
     with rgbd.create_native_undistorted_camera_calibration(color_track.width, color_track.height,
                                                            depth_track.width, depth_track.height,
                                                            0.5, -1.0, 0.5, 0.5) as native_calibration:
+        write_config = rgbd.NativeFileWriterConfig()
+        write_config.set_depth_codec_type(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1)
         file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
-                                            False,
                                             native_calibration,
-                                            30,
-                                            rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1,
-                                            rgbd.lib.RGBD_AUDIO_SAMPLE_RATE())
+                                            write_config)
 
     yuv_frames = []
     color_arrays = []

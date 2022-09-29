@@ -48,6 +48,11 @@ class NativeFileVideoTrack:
         return lib.rgbd_file_video_track_get_height(self.ptr)
 
 
+class NativeFileDepthVideoTrack(NativeFileVideoTrack):
+    def get_depth_unit(self) -> float:
+        return lib.rgbd_file_depth_video_track_get_depth_unit(self.ptr)
+
+
 class NativeFileTracks:
     def __init__(self, ptr, owner: bool):
         self.ptr = ptr
@@ -66,8 +71,8 @@ class NativeFileTracks:
     def get_color_track(self) -> NativeFileVideoTrack:
         return NativeFileVideoTrack(lib.rgbd_file_tracks_get_color_track(self.ptr), False)
 
-    def get_depth_track(self) -> NativeFileVideoTrack:
-        return NativeFileVideoTrack(lib.rgbd_file_tracks_get_depth_track(self.ptr), False)
+    def get_depth_track(self) -> NativeFileDepthVideoTrack:
+        return NativeFileDepthVideoTrack(lib.rgbd_file_tracks_get_depth_track(self.ptr), False)
 
 
 class NativeFileAttachments:
@@ -256,12 +261,19 @@ class FileVideoTrack:
         self.height = native_file_video_track.get_height()
 
 
+class FileDepthVideoTrack(FileVideoTrack):
+    def __init__(self, native_file_depth_video_track: NativeFileDepthVideoTrack):
+        super().__init__(native_file_depth_video_track)
+        self.depth_unit = native_file_depth_video_track.get_depth_unit()
+
+
+
 class FileTracks:
     def __init__(self, native_file_tracks: NativeFileTracks):
         with native_file_tracks.get_color_track() as color_track:
             self.color_track = FileVideoTrack(color_track)
         with native_file_tracks.get_depth_track() as depth_track:
-            self.depth_track = FileVideoTrack(depth_track)
+            self.depth_track = FileDepthVideoTrack(depth_track)
 
 
 class FileVideoFrame:
