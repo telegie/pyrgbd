@@ -21,27 +21,26 @@ def main():
         with native_file_parser.parse_all_frames() as native_file:
             file = rgbd.File(native_file)
             directions = rgbd.get_calibration_directions(native_file)
-            # with native_file.get_attachments() as native_attachments:
-            #     with native_attachments.get_camera_calibration() as native_calibration:
-            #         file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
-            #                                             False,
-            #                                             native_calibration,
-            #                                             30,
-            #                                             rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1,
-            #                                             rgbd.lib.RGBD_AUDIO_SAMPLE_RATE())
+            with native_file.get_attachments() as native_attachments:
+                with native_attachments.get_camera_calibration() as native_calibration:
+                    write_config = rgbd.NativeFileWriterConfig()
+                    write_config.set_depth_codec_type(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1)
+                    file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
+                                                        native_calibration,
+                                                        write_config)
 
     color_track = file.tracks.color_track
     depth_track = file.tracks.depth_track
     print(f"depth_track.depth_unit: {depth_track.depth_unit}")
 
-    with rgbd.create_native_undistorted_camera_calibration(color_track.width, color_track.height,
-                                                           depth_track.width, depth_track.height,
-                                                           0.5, -1.0, 0.5, 0.5) as native_calibration:
-        write_config = rgbd.NativeFileWriterConfig()
-        write_config.set_depth_codec_type(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1)
-        file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
-                                            native_calibration,
-                                            write_config)
+    # with rgbd.create_native_undistorted_camera_calibration(color_track.width, color_track.height,
+    #                                                        depth_track.width, depth_track.height,
+    #                                                        0.5, -1.0, 0.5, 0.5) as native_calibration:
+    #     write_config = rgbd.NativeFileWriterConfig()
+    #     write_config.set_depth_codec_type(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1)
+    #     file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
+    #                                         native_calibration,
+    #                                         write_config)
 
     yuv_frames = []
     color_arrays = []
@@ -77,6 +76,7 @@ def main():
             rgbd.NativeDepthEncoder.create_tdc1_encoder(depth_width, depth_height, 500) as depth_encoder:
         for index in range(len(file.video_frames)):
             video_frame = file.video_frames[index]
+            keyframe = index % 60 == 0
 
             # Write audio frames fitting in front of the video frame.
             while audio_frame_index < len(file.audio_frames):
@@ -103,21 +103,16 @@ def main():
             color_encoder_frame = color_encoder.encode(rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
                                                        rgbd.cast_np_array_to_pointer(yuv_frame.u_channel),
                                                        rgbd.cast_np_array_to_pointer(yuv_frame.v_channel),
-                                                       True)
+                                                       keyframe)
             color_bytes = color_encoder_frame.get_packet().get_data_bytes()
-            depth_bytes = depth_encoder.encode(rgbd.cast_np_array_to_pointer(depth_array), depth_array.size, True)
-            print(f"color_bytes.shape: {color_bytes.shape}")
-            print(f"depth_bytes.shape: {depth_bytes.shape}")
+            depth_bytes = depth_encoder.encode(rgbd.cast_np_array_to_pointer(depth_array), depth_array.size, keyframe)
 
             file_writer.write_video_frame(video_frame.global_timecode,
+                                          keyframe,
                                           rgbd.cast_np_array_to_pointer(color_bytes),
                                           color_bytes.size,
                                           rgbd.cast_np_array_to_pointer(depth_bytes),
-                                          depth_bytes.size,
-                                          video_frame.floor_normal_x,
-                                          video_frame.floor_normal_y,
-                                          video_frame.floor_normal_z,
-                                          video_frame.floor_constant)
+                                          depth_bytes.size)
 
     file_writer.flush()
 
