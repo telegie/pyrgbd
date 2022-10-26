@@ -4,13 +4,15 @@ import os
 import platform
 import shutil
 
+LIBRGBD_VERSION = "1.4.0"
+
 def compile_with_cffi():
     here = Path(__file__).parent.resolve()
 
     ffi = FFI()
 
     if platform.system() == "Windows":
-        librgbd_path = f"{here}\\librgbd-binaries\\1.3.0\\x64-windows"
+        librgbd_path = f"{here}\\librgbd-binaries\\{LIBRGBD_VERSION}\\x64-windows"
         librgbd_include_dir = f"{librgbd_path}\\include"
         library_str = "rgbd-1"
         librgbd_library_dir = f"{librgbd_path}\\bin"
@@ -22,7 +24,7 @@ def compile_with_cffi():
                        library_dirs=[str(librgbd_library_dir)])
 
     elif platform.system() == "Darwin":
-        librgbd_path = f"{here}/librgbd-binaries/1.3.0/arm64-mac"
+        librgbd_path = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/arm64-mac"
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd-1"
         librgbd_library_dir = f"{librgbd_path}/bin"
@@ -37,7 +39,7 @@ def compile_with_cffi():
                        extra_link_args=[extra_link_args_str])
 
     elif platform.system() == "Linux":
-        librgbd_path = f"{here}/librgbd-binaries/1.3.0/x64-linux"
+        librgbd_path = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/x64-linux"
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd-1"
         librgbd_library_dir = f"{librgbd_path}/bin"
@@ -80,7 +82,7 @@ def copy_prebuilt_binaries():
     here = Path(__file__).parent.resolve()
 
     if platform.system() == "Windows":
-        librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/x64-windows/bin"
+        librgbd_bin_dir = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/x64-windows/bin"
         dll_files = ["avcodec-58.dll", "avutil-56.dll", "libwinpthread-1.dll", "rgbd-1.dll", "zlib1.dll"]
         for dll_file in dll_files:
             destination = f"{here}/pyrgbd/{dll_file}"
@@ -89,7 +91,7 @@ def copy_prebuilt_binaries():
             shutil.copy(f"{librgbd_bin_dir}/{dll_file}", destination)
 
     if platform.system() == "Darwin":
-        librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/arm64-mac/bin"
+        librgbd_bin_dir = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/arm64-mac/bin"
         destination = f"{here}/pyrgbd/librgbd-1.dylib"
         # Should remove the existing one before copying.
         # Simply copying does not overwrite properly.
@@ -98,7 +100,7 @@ def copy_prebuilt_binaries():
         shutil.copy(f"{librgbd_bin_dir}/librgbd-1.dylib", destination)
 
     if platform.system() == "Linux":
-        librgbd_bin_dir = f"{here}/librgbd-binaries/1.3.0/x64-linux/bin"
+        librgbd_bin_dir = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/x64-linux/bin"
         destination = f"{here}/pyrgbd/librgbd-1.so"
         # Should remove the existing one before copying.
         # Simply copying does not overwrite properly.

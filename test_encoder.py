@@ -114,8 +114,6 @@ def main():
                                           color_bytes.size,
                                           rgbd.cast_np_array_to_pointer(depth_bytes),
                                           depth_bytes.size,
-                                          rgbd.ffi.cast("void *", 0),
-                                          0,
                                           video_frame.floor_normal_x,
                                           video_frame.floor_normal_y,
                                           video_frame.floor_normal_z,

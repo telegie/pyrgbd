@@ -24,9 +24,6 @@ class NativeFileWriterConfig:
     def set_depth_codec_type(self, depth_codec_type):
         lib.rgbd_file_writer_config_set_depth_codec_type(self.ptr, depth_codec_type)
 
-    def set_has_depth_confidence(self, has_depth_confidence: bool):
-        lib.rgbd_file_writer_config_set_has_depth_confidence(self.ptr, has_depth_confidence)
-
     def set_depth_unit(self, depth_unit: float):
         lib.rgbd_file_writer_config_set_depth_unit(self.ptr, depth_unit)
 
@@ -51,18 +48,26 @@ class NativeFileWriter:
         lib.rgbd_file_writer_write_cover(self.ptr, width, height, y_channel, y_channel_size, u_channel, u_channel_size,
                                          v_channel, v_channel_size)
 
-    def write_video_frame(self, time_point_us: int,
+    def write_video_frame(self, time_point_us: int, keyframe: bool,
                           color_bytes, color_byte_size: int,
-                          depth_bytes, depth_byte_size: int,
-                          depth_confidence_values, depth_confidence_values_size: int,
-                          floor_normal_x: float, floor_normal_y: float, floor_normal_z: float, floor_constant: float):
-        lib.rgbd_file_writer_write_video_frame(self.ptr, time_point_us, color_bytes, color_byte_size,
-                                               depth_bytes, depth_byte_size,
-                                               depth_confidence_values, depth_confidence_values_size,
-                                               floor_normal_x, floor_normal_y, floor_normal_z, floor_constant)
+                          depth_bytes, depth_byte_size: int):
+        lib.rgbd_file_writer_write_video_frame(self.ptr, time_point_us, keyframe,
+                                               color_bytes, color_byte_size,
+                                               depth_bytes, depth_byte_size)
 
     def write_audio_frame(self, time_point_us: int, audio_bytes, audio_byte_size: int):
         lib.rgbd_file_writer_write_audio_frame(self.ptr, time_point_us, audio_bytes, audio_byte_size)
+
+    def write_imu_frame(self, time_point_us: int,
+                        acceleration_x: float, acceleration_y: float, acceleration_z: float,
+                        rotation_rate_x: float, rotation_rate_y: float, rotation_rate_z: float,
+                        magnetic_field_x: float, magnetic_field_y: float, magnetic_field_z: float,
+                        gravity_x: float, gravity_y: float, gravity_z: float):
+        lib.rgbd_file_writer_write_imu_frame(self.ptr, time_point_us,
+                                             acceleration_x, acceleration_y, acceleration_z,
+                                             rotation_rate_x, rotation_rate_y, rotation_rate_z,
+                                             magnetic_field_x, magnetic_field_y, magnetic_field_z,
+                                             gravity_x, gravity_y, gravity_z)
 
     def flush(self):
         lib.rgbd_file_writer_flush(self.ptr)
