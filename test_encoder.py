@@ -1,6 +1,4 @@
 import pyrgbd as rgbd
-import cv2
-import numpy as np
 import requests
 import os.path
 
@@ -71,12 +69,14 @@ def main():
     print(f"depth_width: {depth_width}, depth_height: {depth_height}")
 
     audio_frame_index = 0
+    imu_frame_index = 0
     with rgbd.NativeFFmpegVideoEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8, yuv_frame.width, yuv_frame.height, 2500,
                                        30) as color_encoder, \
             rgbd.NativeDepthEncoder.create_tdc1_encoder(depth_width, depth_height, 500) as depth_encoder:
         for index in range(len(file.video_frames)):
             video_frame = file.video_frames[index]
             keyframe = index % 60 == 0
+            print(f"index: {index}, keyframe: {keyframe}")
 
             # Write audio frames fitting in front of the video frame.
             while audio_frame_index < len(file.audio_frames):
@@ -87,6 +87,26 @@ def main():
                                               rgbd.cast_np_array_to_pointer(audio_frame.bytes),
                                               audio_frame.bytes.size)
                 audio_frame_index = audio_frame_index + 1
+
+            # Write IMU frames fitting in front of the video frame.
+            while imu_frame_index < len(file.imu_frames):
+                imu_frame = file.imu_frames[imu_frame_index]
+                if imu_frame.global_timecode > video_frame.global_timecode:
+                    break
+                file_writer.write_imu_frame(imu_frame.global_timecode,
+                                            imu_frame.acceleration[0],
+                                            imu_frame.acceleration[1],
+                                            imu_frame.acceleration[2],
+                                            imu_frame.rotation_rate[0],
+                                            imu_frame.rotation_rate[1],
+                                            imu_frame.rotation_rate[2],
+                                            imu_frame.magnetic_field[0],
+                                            imu_frame.magnetic_field[1],
+                                            imu_frame.magnetic_field[2],
+                                            imu_frame.gravity[0],
+                                            imu_frame.gravity[1],
+                                            imu_frame.gravity[2])
+                imu_frame_index = imu_frame_index + 1
 
             yuv_frame = yuv_frames[index]
 
