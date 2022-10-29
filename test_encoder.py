@@ -42,7 +42,7 @@ def main():
 
     yuv_frames = []
     color_arrays = []
-    with rgbd.NativeFFmpegVideoDecoder() as color_decoder:
+    with rgbd.NativeColorDecoder() as color_decoder:
         for video_frame in file.video_frames:
             color_bytes = video_frame.color_bytes
             with color_decoder.decode(rgbd.cast_np_array_to_pointer(color_bytes), color_bytes.size) as native_yuv_frame:
@@ -70,8 +70,8 @@ def main():
 
     audio_frame_index = 0
     imu_frame_index = 0
-    with rgbd.NativeFFmpegVideoEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8, yuv_frame.width, yuv_frame.height, 2500,
-                                       30) as color_encoder, \
+    with rgbd.NativeColorEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8, yuv_frame.width, yuv_frame.height, 2500,
+                                 30) as color_encoder, \
             rgbd.NativeDepthEncoder.create_tdc1_encoder(depth_width, depth_height, 500) as depth_encoder:
         for index in range(len(file.video_frames)):
             video_frame = file.video_frames[index]

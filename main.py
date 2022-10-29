@@ -27,7 +27,7 @@ def main():
 
     # Decode color frames.
     color_arrays = []
-    with rgbd.NativeFFmpegVideoDecoder() as color_decoder:
+    with rgbd.NativeColorDecoder() as color_decoder:
         for video_frame in file.video_frames:
             color_bytes = video_frame.color_bytes
             with color_decoder.decode(rgbd.cast_np_array_to_pointer(color_bytes), color_bytes.size) as native_yuv_frame:
