@@ -32,7 +32,6 @@ def main():
             file = rgbd.File(native_file)
 
     with file.attachments.camera_calibration.create_native_instance() as native_calibration:
-        print(f"fx: {native_calibration.get_fx()}, fy: {native_calibration.get_fy()}, cx: {native_calibration.get_cx()}, cy: {native_calibration.get_cy()}")
         write_config = rgbd.NativeFileWriterConfig()
         write_config.set_depth_codec_type(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1)
         file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
