@@ -1,6 +1,6 @@
 from ._librgbd import ffi, lib
 from .capi_containers import NativeByteArray
-from .calibration import NativeCameraCalibration
+from .calibration import NativeCameraCalibration, CameraCalibration
 import numpy as np
 
 
@@ -91,7 +91,7 @@ class NativeFileAttachments:
         self.close()
 
     def get_camera_calibration(self) -> NativeCameraCalibration:
-        return NativeCameraCalibration(lib.rgbd_file_attachments_get_camera_calibration(self.ptr), False)
+        return NativeCameraCalibration.create(lib.rgbd_file_attachments_get_camera_calibration(self.ptr), False)
 
 
 class NativeFileVideoFrame:
@@ -267,13 +267,18 @@ class FileDepthVideoTrack(FileVideoTrack):
         self.depth_unit = native_file_depth_video_track.get_depth_unit()
 
 
+class FileAttachments:
+    def __init__(self, native_file_attachments: NativeFileAttachments):
+        with native_file_attachments.get_camera_calibration() as native_camera_calibration:
+            self.camera_calibration = CameraCalibration.create(native_camera_calibration)
+
 
 class FileTracks:
     def __init__(self, native_file_tracks: NativeFileTracks):
-        with native_file_tracks.get_color_track() as color_track:
-            self.color_track = FileVideoTrack(color_track)
-        with native_file_tracks.get_depth_track() as depth_track:
-            self.depth_track = FileDepthVideoTrack(depth_track)
+        with native_file_tracks.get_color_track() as native_color_track:
+            self.color_track = FileVideoTrack(native_color_track)
+        with native_file_tracks.get_depth_track() as native_depth_track:
+            self.depth_track = FileDepthVideoTrack(native_depth_track)
 
 
 class FileVideoFrame:
@@ -323,10 +328,12 @@ class FileIMUFrame:
 
 class File:
     def __init__(self, native_file: NativeFile):
-        with native_file.get_info() as info:
-            self.info = FileInfo(info)
-        with native_file.get_tracks() as tracks:
-            self.tracks = FileTracks(tracks)
+        with native_file.get_info() as native_info:
+            self.info = FileInfo(native_info)
+        with native_file.get_tracks() as native_tracks:
+            self.tracks = FileTracks(native_tracks)
+        with native_file.get_attachments() as native_attachments:
+            self.attachments = FileAttachments(native_attachments)
 
         self.video_frames = []
         video_frame_count = native_file.get_video_frame_count()
@@ -345,3 +352,22 @@ class File:
         for index in range(imu_frame_count):
             with native_file.get_imu_frame(index) as native_file_imu_frame:
                 self.imu_frames.append(FileIMUFrame(native_file_imu_frame))
+
+
+def get_calibration_directions(native_file: NativeFile) -> np.ndarray:
+    # Get directions array from the native_camera_calibration.
+    # native_camera_calibration should be GC'ed here while directions will be needed.
+    directions = []
+    with native_file.get_attachments() as native_attachments:
+        with native_attachments.get_camera_calibration() as native_camera_calibration:
+            depth_width = native_camera_calibration.get_depth_width()
+            depth_height = native_camera_calibration.get_depth_height()
+            for row in range(depth_height):
+                v = row / depth_height
+                for col in range(depth_width):
+                    u = col / depth_width
+                    with native_camera_calibration.get_direction(u, v) as native_direction:
+                        directions.append(native_direction.to_np_array())
+
+    directions = np.reshape(directions, (depth_height, depth_width, 3))
+    return directions

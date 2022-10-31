@@ -3,7 +3,6 @@ import base64
 import io
 import cv2
 import numpy as np
-from .file import NativeFile
 from .frame import NativeYuvFrame, NativeInt32Frame, YuvFrame
 
 
@@ -68,25 +67,6 @@ def convert_rgb_to_yuv420(rgb_array: np.ndarray):
     v_array = np.reshape(v_array, (rgb_height // 2, rgb_width // 2))
 
     return y_array, u_array, v_array
-
-
-def get_calibration_directions(native_file: NativeFile) -> np.ndarray:
-    # Get directions array from the native_camera_calibration.
-    # native_camera_calibration should be GC'ed here while directions will be needed.
-    directions = []
-    with native_file.get_attachments() as native_attachments:
-        with native_attachments.get_camera_calibration() as native_camera_calibration:
-            depth_width = native_camera_calibration.get_depth_width()
-            depth_height = native_camera_calibration.get_depth_height()
-            for row in range(depth_height):
-                v = row / depth_height
-                for col in range(depth_width):
-                    u = col / depth_width
-                    with native_camera_calibration.get_direction(u, v) as native_direction:
-                        directions.append(native_direction.to_np_array())
-
-    directions = np.reshape(directions, (depth_height, depth_width, 3))
-    return directions
 
 
 def convert_native_int32_frame_to_depth_array(native_int32_frame: NativeInt32Frame) -> np.array:

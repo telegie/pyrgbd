@@ -15,17 +15,29 @@ def main():
         with open(video_file_path, "wb") as file:
             file.write(response.content)
 
+    # with rgbd.NativeFileParser(video_file_path) as native_file_parser:
+    #     with native_file_parser.parse_all_frames() as native_file:
+    #         file = rgbd.File(native_file)
+    #         directions = rgbd.get_calibration_directions(native_file)
+    #         with native_file.get_attachments() as native_attachments:
+    #             with native_attachments.get_camera_calibration() as native_calibration:
+    #                 write_config = rgbd.NativeFileWriterConfig()
+    #                 write_config.set_depth_codec_type(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1)
+    #                 file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
+    #                                                     native_calibration,
+    #                                                     write_config)
+
     with rgbd.NativeFileParser(video_file_path) as native_file_parser:
         with native_file_parser.parse_all_frames() as native_file:
             file = rgbd.File(native_file)
-            directions = rgbd.get_calibration_directions(native_file)
-            with native_file.get_attachments() as native_attachments:
-                with native_attachments.get_camera_calibration() as native_calibration:
-                    write_config = rgbd.NativeFileWriterConfig()
-                    write_config.set_depth_codec_type(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1)
-                    file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
-                                                        native_calibration,
-                                                        write_config)
+
+    with file.attachments.camera_calibration.create_native_instance() as native_calibration:
+        print(f"fx: {native_calibration.get_fx()}, fy: {native_calibration.get_fy()}, cx: {native_calibration.get_cx()}, cy: {native_calibration.get_cy()}")
+        write_config = rgbd.NativeFileWriterConfig()
+        write_config.set_depth_codec_type(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1)
+        file_writer = rgbd.NativeFileWriter("tmp/written_file.mkv",
+                                            native_calibration,
+                                            write_config)
 
     color_track = file.tracks.color_track
     depth_track = file.tracks.depth_track
