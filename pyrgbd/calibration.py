@@ -267,7 +267,6 @@ class UndistortedCameraCalibration(CameraCalibration):
         self.fy = native_undistorted_camera_calibration.get_fy()
         self.cx = native_undistorted_camera_calibration.get_cx()
         self.cy = native_undistorted_camera_calibration.get_cy()
-        print(f"fx: {self.fx}, fy: {self.fy}, cx: {self.cx}, cy: {self.cy}")
 
     def create_native_instance(self) -> NativeUndistortedCameraCalibration:
         ptr = lib.rgbd_undistorted_camera_calibration_ctor(self.color_width,
