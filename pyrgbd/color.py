@@ -1,26 +1,6 @@
 from ._librgbd import ffi, lib
 from .frame import NativeYuvFrame
-from .capi_containers import NativeByteArray
-import numpy as np
-
-
-class NativeAVPacket:
-    def __init__(self, ptr, owner: bool):
-        self.ptr = ptr
-        self.owner = owner
-
-    def close(self):
-        if self.owner:
-            lib.rgbd_av_packet_handle_dtor(self.ptr)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
-
-    def get_data_bytes(self) -> np.array:
-        return NativeByteArray(lib.rgbd_av_packet_handle_get_data_bytes(self.ptr)).to_np_array()
+from .av_packet_handle import NativeAVPacketHandle
 
 
 class NativeColorDecoder:
@@ -55,8 +35,8 @@ class NativeColorEncoderFrame:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def get_packet(self) -> NativeAVPacket:
-        return NativeAVPacket(lib.rgbd_color_encoder_frame_get_packet(self.ptr), False)
+    def get_packet(self) -> NativeAVPacketHandle:
+        return NativeAVPacketHandle(lib.rgbd_color_encoder_frame_get_packet(self.ptr), False)
 
 
 class NativeColorEncoder:
