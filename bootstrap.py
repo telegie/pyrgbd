@@ -7,12 +7,12 @@ import subprocess
 
 
 def build_librgbd():
+    here = Path(__file__).parent.resolve()
     if platform.system() == "Darwin":
-        subprocess.run(["mkdir", "build"])
-        # result = subprocess.run(["cmake", "-S", "librgbd", "-B", "build", "-D", "CMAKE_INSTALL_PREFIX=install"], shell=True)
-        result = subprocess.run(["cmake -S librgbd -B build -D CMAKE_INSTALL_PREFIX=install"], shell=True)
-        subprocess.run(["make", "-C", "build", "-j8"])
-        subprocess.run(["make", "-C", "build", "install"])
+        subprocess.run(["mkdir", f"{here}/build"])
+        subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", f"{here}/build", "-D", f"CMAKE_INSTALL_PREFIX={here}/install"])
+        subprocess.run(["make", "-C", f"{here}/build", "-j8"])
+        subprocess.run(["make", "-C", f"{here}/build", "install"])
 
 
 def compile_with_cffi():
