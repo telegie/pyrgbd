@@ -22,9 +22,6 @@ def main():
             file = rgbd.File(native_file)
             directions = rgbd.get_calibration_directions(native_file)
 
-    color_track = file.tracks.color_track
-    depth_track = file.tracks.depth_track
-
     # Decode color frames.
     color_arrays = []
     with rgbd.NativeColorDecoder() as color_decoder:

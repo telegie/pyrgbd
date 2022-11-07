@@ -8,7 +8,13 @@ import subprocess
 
 def build_librgbd():
     here = Path(__file__).parent.resolve()
-    if platform.system() == "Darwin":
+    if platform.system() == "Windows":
+        subprocess.run(["mkdir", f"{here}\\build"], shell=True)
+        # Skipping -A x64 causes a problem when running INSTALL.vcxproj.
+        # ref: https://stackoverflow.com/questions/62448981/cmake-msbuild-fails-to-build-vctargetspath-vcxproj
+        subprocess.run(["cmake", "-S", f"{here}\\librgbd", "-B", f"{here}\\build", "-A", "x64", "-D", f"CMAKE_INSTALL_PREFIX={here}\\install"], shell=True)
+        subprocess.run(["msbuild", f"{here}\\build\\INSTALL.vcxproj", "/p:Configuration=RelWithDebInfo"], shell=True)
+    elif platform.system() == "Darwin":
         subprocess.run(["mkdir", f"{here}/build"])
         subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", f"{here}/build", "-D", f"CMAKE_INSTALL_PREFIX={here}/install"])
         subprocess.run(["make", "-C", f"{here}/build", "-j8"])
@@ -22,13 +28,11 @@ def build_librgbd():
 
 def compile_with_cffi():
     here = Path(__file__).parent.resolve()
-
     ffi = FFI()
-
     if platform.system() == "Windows":
-        librgbd_path = f"{here}\\librgbd-binaries\\{LIBRGBD_VERSION}\\x64-windows"
+        librgbd_path = f"{here}\\install"
         librgbd_include_dir = f"{librgbd_path}\\include"
-        library_str = "rgbd-1"
+        library_str = "rgbd"
         librgbd_library_dir = f"{librgbd_path}\\bin"
 
         ffi.set_source('_librgbd',
@@ -96,13 +100,25 @@ def copy_binaries():
     here = Path(__file__).parent.resolve()
 
     if platform.system() == "Windows":
-        librgbd_bin_dir = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/x64-windows/bin"
-        dll_files = ["avcodec-58.dll", "avutil-56.dll", "libwinpthread-1.dll", "rgbd-1.dll", "zlib1.dll"]
-        for dll_file in dll_files:
-            destination = f"{here}/pyrgbd/{dll_file}"
+        librgbd_dll_dirs = [f"{here}\\install\\bin"]
+        librgbd_dll_filenames = ["rgbd.dll"]
+
+        ffmpeg_binaries_dir = f"{here}\\librgbd\\deps\\ffmpeg-binaries"
+        librgbd_dll_dirs.append(f"{ffmpeg_binaries_dir}\\bin")
+        librgbd_dll_filenames.append("libwinpthread-1.dll")
+        librgbd_dll_dirs.append(f"{ffmpeg_binaries_dir}\\bin")
+        librgbd_dll_filenames.append("zlib1.dll")
+        librgbd_dll_dirs.append(f"{ffmpeg_binaries_dir}\\4.4.1\\x64-windows\\bin")
+        librgbd_dll_filenames.append("avcodec-58.dll")
+        librgbd_dll_dirs.append(f"{ffmpeg_binaries_dir}\\4.4.1\\x64-windows\\bin")
+        librgbd_dll_filenames.append("avutil-56.dll")
+        for index in range(len(librgbd_dll_dirs)):
+            dll_dir = librgbd_dll_dirs[index]
+            dll_filename = librgbd_dll_filenames[index]
+            destination = f"{here}\\pyrgbd\\{dll_filename}"
             if os.path.exists(destination):
                 os.remove(destination)
-            shutil.copy(f"{librgbd_bin_dir}/{dll_file}", destination)
+            shutil.copy(f"{dll_dir}\\{dll_filename}", destination)
 
     if platform.system() == "Darwin":
         librgbd_bin_dir = f"{here}/install/bin"
