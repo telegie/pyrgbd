@@ -1,21 +1,22 @@
 # pyrgbd
 
-## Installation
-
-### Linux Only
+## Linux Requirements
 
 - add-apt-repository ppa:deadsnakes/ppa
 - apt install python3.9-dev python3.9-distutils libgl1 python3-venv python3-cachecontrol
 
-### Everywhere
-
+## Setup
 - poetry shell
 - pip install -U setuptools
 - poetry install
-- Run "python bootstrap_librgbd.py" to build the binary files needed for pyrgbd to operate.
+- git submodule update --init --recursive
+- python bootstrap
 
-## Notes on Packaging
+## Packaging
 
-python -m build --wheel
+- python -m build --wheel
+- Not using poetry build since it only supports pure python packages (yet).
 
-Not using poetry build since it only supports pure python packages (yet).
+## Building with C++ source
+
+

@@ -137,3 +137,7 @@ pyrgbd/Release
 
 # Prebuilt binaries
 *.dylib
+
+# build and install folders from building librgbd
+/build
+/install

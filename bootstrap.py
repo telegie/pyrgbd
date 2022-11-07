@@ -3,8 +3,17 @@ from pathlib import Path
 import os
 import platform
 import shutil
+import subprocess
 
-LIBRGBD_VERSION = "1.4.0"
+
+def build_librgbd():
+    if platform.system() == "Darwin":
+        subprocess.run(["mkdir", "build"])
+        # result = subprocess.run(["cmake", "-S", "librgbd", "-B", "build", "-D", "CMAKE_INSTALL_PREFIX=install"], shell=True)
+        result = subprocess.run(["cmake -S librgbd -B build -D CMAKE_INSTALL_PREFIX=install"], shell=True)
+        subprocess.run(["make", "-C", "build", "-j8"])
+        subprocess.run(["make", "-C", "build", "install"])
+
 
 def compile_with_cffi():
     here = Path(__file__).parent.resolve()
@@ -24,9 +33,9 @@ def compile_with_cffi():
                        library_dirs=[str(librgbd_library_dir)])
 
     elif platform.system() == "Darwin":
-        librgbd_path = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/arm64-mac"
+        librgbd_path = f"{here}/install"
         librgbd_include_dir = f"{librgbd_path}/include"
-        library_str = "rgbd-1"
+        library_str = "rgbd"
         librgbd_library_dir = f"{librgbd_path}/bin"
         # Add same directory in rpath to find the dylib in the same directory.
         extra_link_args_str = f"-Wl,-rpath,{here}/pyrgbd"
@@ -78,7 +87,7 @@ def compile_with_cffi():
     ffi.compile(tmpdir=f"{here}/pyrgbd")
 
 
-def copy_prebuilt_binaries():
+def copy_binaries():
     here = Path(__file__).parent.resolve()
 
     if platform.system() == "Windows":
@@ -91,13 +100,13 @@ def copy_prebuilt_binaries():
             shutil.copy(f"{librgbd_bin_dir}/{dll_file}", destination)
 
     if platform.system() == "Darwin":
-        librgbd_bin_dir = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/arm64-mac/bin"
-        destination = f"{here}/pyrgbd/librgbd-1.dylib"
+        librgbd_bin_dir = f"{here}/install/bin"
+        destination = f"{here}/pyrgbd/librgbd.dylib"
         # Should remove the existing one before copying.
         # Simply copying does not overwrite properly.
         if os.path.exists(destination):
             os.remove(destination)
-        shutil.copy(f"{librgbd_bin_dir}/librgbd-1.dylib", destination)
+        shutil.copy(f"{librgbd_bin_dir}/librgbd.dylib", destination)
 
     if platform.system() == "Linux":
         librgbd_bin_dir = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/x64-linux/bin"
@@ -109,14 +118,13 @@ def copy_prebuilt_binaries():
         shutil.copy(f"{librgbd_bin_dir}/librgbd-1.so", destination)
 
 
-def bootstrap_librgbd():
-    compile_with_cffi()
-    print(f"compile_with_cffi done")
-    copy_prebuilt_binaries()
-
-
 def main():
-    bootstrap_librgbd()
+    build_librgbd()
+    print("build_librgbd done")
+    compile_with_cffi()
+    print("compile_with_cffi done")
+    copy_binaries()
+    print("copy_binaries done")
 
 
 if __name__ == "__main__":

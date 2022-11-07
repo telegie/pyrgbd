@@ -7,9 +7,10 @@ def main():
     print(f"TWO: {rgbd.get_number_two()}")
     print(f"MAJOR: {rgbd.get_librgbd_major_version()}")
 
-    video_file_path = "tmp/example.mkv"
+    base64url_video_id = "A9oofdweNJ4"
+    video_file_path = f"tmp/{base64url_video_id}.mkv"
     if not os.path.exists(video_file_path):
-        video_id = rgbd.decode_base64url_to_long("YVqrvHmHlmU")
+        video_id = rgbd.decode_base64url_to_long(base64url_video_id)
         video_url = f"https://videos.telegie.com/v1/{video_id}/{video_id}.mkv"
         response = requests.get(video_url)
         with open(video_file_path, "wb") as file:
