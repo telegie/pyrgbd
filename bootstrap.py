@@ -13,6 +13,11 @@ def build_librgbd():
         subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", f"{here}/build", "-D", f"CMAKE_INSTALL_PREFIX={here}/install"])
         subprocess.run(["make", "-C", f"{here}/build", "-j8"])
         subprocess.run(["make", "-C", f"{here}/build", "install"])
+    elif platform.system() == "Linux":
+        subprocess.run(["mkdir", f"{here}/build"])
+        subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", f"{here}/build", "-D", f"CMAKE_INSTALL_PREFIX={here}/install"])
+        subprocess.run(["make", "-C", f"{here}/build", "-j8"])
+        subprocess.run(["make", "-C", f"{here}/build", "install"])
 
 
 def compile_with_cffi():
@@ -48,9 +53,9 @@ def compile_with_cffi():
                        extra_link_args=[extra_link_args_str])
 
     elif platform.system() == "Linux":
-        librgbd_path = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/x64-linux"
+        librgbd_path = f"{here}/install"
         librgbd_include_dir = f"{librgbd_path}/include"
-        library_str = "rgbd-1"
+        library_str = "rgbd"
         librgbd_library_dir = f"{librgbd_path}/bin"
         extra_link_args_str = f"-Wl,-rpath,{here}/pyrgbd"
 
@@ -109,13 +114,13 @@ def copy_binaries():
         shutil.copy(f"{librgbd_bin_dir}/librgbd.dylib", destination)
 
     if platform.system() == "Linux":
-        librgbd_bin_dir = f"{here}/librgbd-binaries/{LIBRGBD_VERSION}/x64-linux/bin"
-        destination = f"{here}/pyrgbd/librgbd-1.so"
+        librgbd_bin_dir = f"{here}/install/bin"
+        destination = f"{here}/pyrgbd/librgbd.so"
         # Should remove the existing one before copying.
         # Simply copying does not overwrite properly.
         if os.path.exists(destination):
             os.remove(destination)
-        shutil.copy(f"{librgbd_bin_dir}/librgbd-1.so", destination)
+        shutil.copy(f"{librgbd_bin_dir}/librgbd.so", destination)
 
 
 def main():
