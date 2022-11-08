@@ -26,6 +26,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
-      - run: poetry shell
-      - run: python bootstrap.py
-      - run: python test_encoder.py
+      - run: poetry run python bootstrap.py
+      - run: poetry run python test_encoder.py
