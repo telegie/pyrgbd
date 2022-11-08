@@ -1,5 +1,6 @@
 from ._librgbd import ffi, lib
 from .calibration import NativeCameraCalibration
+from .math import Vector3
 
 
 class NativeFileWriterConfig:
@@ -59,15 +60,13 @@ class NativeFileWriter:
         lib.rgbd_file_writer_write_audio_frame(self.ptr, time_point_us, audio_bytes, audio_byte_size)
 
     def write_imu_frame(self, time_point_us: int,
-                        acceleration_x: float, acceleration_y: float, acceleration_z: float,
-                        rotation_rate_x: float, rotation_rate_y: float, rotation_rate_z: float,
-                        magnetic_field_x: float, magnetic_field_y: float, magnetic_field_z: float,
-                        gravity_x: float, gravity_y: float, gravity_z: float):
+                        acceleration: Vector3, rotation_rate: Vector3,
+                        magnetic_field: Vector3, gravity: Vector3):
         lib.rgbd_file_writer_write_imu_frame(self.ptr, time_point_us,
-                                             acceleration_x, acceleration_y, acceleration_z,
-                                             rotation_rate_x, rotation_rate_y, rotation_rate_z,
-                                             magnetic_field_x, magnetic_field_y, magnetic_field_z,
-                                             gravity_x, gravity_y, gravity_z)
+                                             acceleration.x, acceleration.y, acceleration.z,
+                                             rotation_rate.x, rotation_rate.y, rotation_rate.z,
+                                             magnetic_field.x, magnetic_field.y, magnetic_field.z,
+                                             gravity.x, gravity.y, gravity.z)
 
     def flush(self):
         lib.rgbd_file_writer_flush(self.ptr)

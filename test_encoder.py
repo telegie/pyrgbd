@@ -106,18 +106,10 @@ def main():
                 if imu_frame.global_timecode > video_frame.global_timecode:
                     break
                 file_writer.write_imu_frame(imu_frame.global_timecode,
-                                            imu_frame.acceleration[0],
-                                            imu_frame.acceleration[1],
-                                            imu_frame.acceleration[2],
-                                            imu_frame.rotation_rate[0],
-                                            imu_frame.rotation_rate[1],
-                                            imu_frame.rotation_rate[2],
-                                            imu_frame.magnetic_field[0],
-                                            imu_frame.magnetic_field[1],
-                                            imu_frame.magnetic_field[2],
-                                            imu_frame.gravity[0],
-                                            imu_frame.gravity[1],
-                                            imu_frame.gravity[2])
+                                            imu_frame.acceleration,
+                                            imu_frame.rotation_rate,
+                                            imu_frame.magnetic_field,
+                                            imu_frame.gravity)
                 imu_frame_index = imu_frame_index + 1
 
             yuv_frame = yuv_frames[index]
