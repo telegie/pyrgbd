@@ -1,6 +1,6 @@
 from ._librgbd import ffi, lib
 from .calibration import NativeCameraCalibration
-from .math import Vector3
+from .math import Vector3, Quaternion
 
 
 class NativeFileWriterConfig:
@@ -67,6 +67,12 @@ class NativeFileWriter:
                                              rotation_rate.x, rotation_rate.y, rotation_rate.z,
                                              magnetic_field.x, magnetic_field.y, magnetic_field.z,
                                              gravity.x, gravity.y, gravity.z)
+    def write_trs_frame(self, time_point_us: int,
+                        translation: Vector3, rotation: Quaternion, scale: Vector3):
+        lib.rgbd_file_writer_write_trs_frame(self.ptr, time_point_us,
+                                             translation.x, translation.y, translation.z,
+                                             rotation.w, rotation.x, rotation.y, rotation.z,
+                                             scale.x, scale.y, scale.z)
 
     def flush(self):
         lib.rgbd_file_writer_flush(self.ptr)

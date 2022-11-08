@@ -138,6 +138,11 @@ def main():
                                           rgbd.cast_np_array_to_pointer(depth_bytes),
                                           depth_bytes.size)
 
+            file_writer.write_trs_frame(video_frame.global_timecode,
+                                        rgbd.Vector3(0, 0, 0),
+                                        rgbd.Quaternion(1, 0, 0, 0),
+                                        rgbd.Vector3(1, 2, 1))
+
     file_writer.flush()
 
 
