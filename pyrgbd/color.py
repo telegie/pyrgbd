@@ -1,6 +1,8 @@
 from ._librgbd import ffi, lib
-from .frame import NativeYuvFrame
+from .frame import NativeYuvFrame, YuvFrame
 from .av_packet_handle import NativeAVPacketHandle
+from .utils import cast_np_array_to_pointer
+import numpy as np
 
 
 class NativeColorDecoder:
@@ -18,8 +20,13 @@ class NativeColorDecoder:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def decode(self, vp8_frame_data, vp8_frame_size) -> NativeYuvFrame:
-        return NativeYuvFrame(lib.rgbd_color_decoder_decode(self.ptr, vp8_frame_data, vp8_frame_size))
+    def decode(self, color_frame_bytes: np.ndarray) -> YuvFrame:
+        native_yuv_frame_ptr = lib.rgbd_color_decoder_decode(self.ptr,
+                                                             cast_np_array_to_pointer(color_frame_bytes),
+                                                             color_frame_bytes.size)
+        with NativeYuvFrame(native_yuv_frame_ptr) as native_yuv_frame:
+            yuv_frame = YuvFrame(native_yuv_frame)
+        return yuv_frame
 
 
 class NativeColorEncoderFrame:

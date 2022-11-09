@@ -67,10 +67,3 @@ def convert_rgb_to_yuv420(rgb_array: np.ndarray):
     v_array = np.reshape(v_array, (rgb_height // 2, rgb_width // 2))
 
     return y_array, u_array, v_array
-
-
-def convert_native_int32_frame_to_depth_array(native_int32_frame: NativeInt32Frame) -> np.array:
-    width = native_int32_frame.get_width()
-    height = native_int32_frame.get_height()
-    depth_array = native_int32_frame.get_values().to_np_array()
-    return depth_array.reshape((height, width))

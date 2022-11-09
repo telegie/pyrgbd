@@ -67,3 +67,10 @@ class YuvFrame:
 
         v_channel = native_yuv_frame.get_v_channel().to_np_array()
         self.v_channel = v_channel.reshape((self.height // 2, self.width // 2))
+
+
+class Int32Frame:
+    def __init__(self, native_int32_frame: NativeInt32Frame):
+        self.width = native_int32_frame.get_width()
+        self.height = native_int32_frame.get_height()
+        self.values = native_int32_frame.get_values().to_np_array().reshape((self.height, self.width))
