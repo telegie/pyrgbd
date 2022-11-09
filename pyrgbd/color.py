@@ -25,7 +25,7 @@ class NativeColorDecoder:
                                                              cast_np_array_to_pointer(color_frame_bytes),
                                                              color_frame_bytes.size)
         with NativeYuvFrame(native_yuv_frame_ptr) as native_yuv_frame:
-            yuv_frame = YuvFrame(native_yuv_frame)
+            yuv_frame = YuvFrame.from_native(native_yuv_frame)
         return yuv_frame
 
 

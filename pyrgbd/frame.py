@@ -1,6 +1,8 @@
 from ._librgbd import ffi, lib
 from .capi_containers import NativeUInt8Array, NativeInt32Array
 import numpy as np
+from typing import TypeVar
+
 
 class NativeYuvFrame:
     def __init__(self, ptr):
@@ -54,19 +56,32 @@ class NativeInt32Frame:
         return NativeInt32Array(lib.rgbd_int32_frame_get_values(self.ptr))
 
 
+YuvFrameT = TypeVar('YuvFrameT', bound='YuvFrame')
+
+
 class YuvFrame:
-    def __init__(self, native_yuv_frame: NativeYuvFrame):
-        self.width = native_yuv_frame.get_width()
-        self.height = native_yuv_frame.get_height()
+    def __init__(self, width: int, height: int,
+                 y_channel: np.ndarray, u_channel: np.ndarray, v_channel: np.ndarray):
+        self.width = width
+        self.height = height
+        self.y_channel = y_channel
+        self.u_channel = u_channel
+        self.v_channel = v_channel
+
+    @staticmethod
+    def from_native(native_yuv_frame: NativeYuvFrame) -> YuvFrameT:
+        width = native_yuv_frame.get_width()
+        height = native_yuv_frame.get_height()
 
         y_channel = native_yuv_frame.get_y_channel().to_np_array()
-        self.y_channel = y_channel.reshape((self.height, self.width))
+        y_channel = y_channel.reshape((height, width))
 
         u_channel = native_yuv_frame.get_u_channel().to_np_array()
-        self.u_channel = u_channel.reshape((self.height // 2, self.width // 2))
+        u_channel = u_channel.reshape((height // 2, width // 2))
 
         v_channel = native_yuv_frame.get_v_channel().to_np_array()
-        self.v_channel = v_channel.reshape((self.height // 2, self.width // 2))
+        v_channel = v_channel.reshape((height // 2, width // 2))
+        return YuvFrame(width, height, y_channel, u_channel, v_channel)
 
 
 class Int32Frame:
