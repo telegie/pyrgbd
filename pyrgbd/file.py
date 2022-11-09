@@ -113,6 +113,9 @@ class NativeFileVideoFrame:
     def get_global_timecode(self) -> int:
         return lib.rgbd_file_video_frame_get_global_timecode(self.ptr)
 
+    def get_keyframe(self) -> bool:
+        return lib.rgbd_file_video_frame_get_keyframe(self.ptr)
+
     def get_color_bytes(self) -> NativeByteArray:
         return NativeByteArray(lib.rgbd_file_video_frame_get_color_bytes(self.ptr))
 
@@ -285,6 +288,7 @@ class FileTracks:
 class FileVideoFrame:
     def __init__(self, native_file_video_frame: NativeFileVideoFrame):
         self.global_timecode = native_file_video_frame.get_global_timecode()
+        self.keyframe = native_file_video_frame.get_keyframe()
         with native_file_video_frame.get_color_bytes() as color_bytes:
             self.color_bytes = color_bytes.to_np_array()
         with native_file_video_frame.get_depth_bytes() as depth_bytes:
