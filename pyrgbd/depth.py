@@ -48,6 +48,9 @@ class NativeDepthEncoder:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def encode(self, depth_values_data, depth_values_size: int, keyframe: bool) -> np.array:
+    def encode(self, depth_values: np.ndarray, keyframe: bool) -> np.array:
         return NativeByteArray(
-            lib.rgbd_depth_encoder_encode(self.ptr, depth_values_data, depth_values_size, keyframe)).to_np_array()
+            lib.rgbd_depth_encoder_encode(self.ptr,
+                                          cast_np_array_to_pointer(depth_values),
+                                          depth_values.size,
+                                          keyframe)).to_np_array()

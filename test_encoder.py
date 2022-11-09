@@ -77,7 +77,10 @@ def main():
 
     audio_frame_index = 0
     imu_frame_index = 0
-    with rgbd.NativeColorEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8, yuv_frame.width, yuv_frame.height, 2500,
+    with rgbd.NativeColorEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8,
+                                 yuv_frame.width,
+                                 yuv_frame.height,
+                                 2500,
                                  30) as color_encoder, \
             rgbd.NativeDepthEncoder.create_tdc1_encoder(depth_width, depth_height, 500) as depth_encoder:
         for index in range(len(file.video_frames)):
@@ -110,28 +113,17 @@ def main():
             yuv_frame = yuv_frames[index]
 
             if index == 0:
-                file_writer.write_cover(yuv_frame.width, yuv_frame.height,
-                                        rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
-                                        yuv_frame.y_channel.size,
-                                        rgbd.cast_np_array_to_pointer(yuv_frame.u_channel),
-                                        yuv_frame.u_channel.size,
-                                        rgbd.cast_np_array_to_pointer(yuv_frame.v_channel),
-                                        yuv_frame.v_channel.size)
+                file_writer.write_cover(yuv_frame)
 
             depth_frame = depth_frames[index]
-            color_encoder_frame = color_encoder.encode(rgbd.cast_np_array_to_pointer(yuv_frame.y_channel),
-                                                       rgbd.cast_np_array_to_pointer(yuv_frame.u_channel),
-                                                       rgbd.cast_np_array_to_pointer(yuv_frame.v_channel),
-                                                       keyframe)
+            color_encoder_frame = color_encoder.encode(yuv_frame, keyframe)
             color_bytes = color_encoder_frame.get_packet().get_data_bytes()
-            depth_bytes = depth_encoder.encode(rgbd.cast_np_array_to_pointer(depth_frame.values), depth_frame.values.size, keyframe)
+            depth_bytes = depth_encoder.encode(depth_frame.values, keyframe)
 
             file_writer.write_video_frame(video_frame.global_timecode,
                                           keyframe,
-                                          rgbd.cast_np_array_to_pointer(color_bytes),
-                                          color_bytes.size,
-                                          rgbd.cast_np_array_to_pointer(depth_bytes),
-                                          depth_bytes.size)
+                                          color_bytes,
+                                          depth_bytes)
 
             file_writer.write_trs_frame(video_frame.global_timecode,
                                         rgbd.Vector3(0, 0, 0),

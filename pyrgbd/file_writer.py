@@ -1,6 +1,9 @@
 from ._librgbd import ffi, lib
 from .calibration import NativeCameraCalibration
 from .math import Vector3, Quaternion
+from .frame import YuvFrame
+from .utils import cast_np_array_to_pointer
+import numpy as np
 
 
 class NativeFileWriterConfig:
@@ -42,19 +45,22 @@ class NativeFileWriter:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def write_cover(self, width: int, height: int,
-                    y_channel, y_channel_size: int,
-                    u_channel, u_channel_size: int,
-                    v_channel, v_channel_size: int):
-        lib.rgbd_file_writer_write_cover(self.ptr, width, height, y_channel, y_channel_size, u_channel, u_channel_size,
-                                         v_channel, v_channel_size)
+    def write_cover(self, yuv_frame: YuvFrame):
+        lib.rgbd_file_writer_write_cover(self.ptr,
+                                         yuv_frame.width,
+                                         yuv_frame.height,
+                                         cast_np_array_to_pointer(yuv_frame.y_channel),
+                                         yuv_frame.y_channel.size,
+                                         cast_np_array_to_pointer(yuv_frame.u_channel),
+                                         yuv_frame.u_channel.size,
+                                         cast_np_array_to_pointer(yuv_frame.v_channel),
+                                         yuv_frame.v_channel.size)
 
     def write_video_frame(self, time_point_us: int, keyframe: bool,
-                          color_bytes, color_byte_size: int,
-                          depth_bytes, depth_byte_size: int):
+                          color_bytes: np.ndarray, depth_bytes: np.ndarray):
         lib.rgbd_file_writer_write_video_frame(self.ptr, time_point_us, keyframe,
-                                               color_bytes, color_byte_size,
-                                               depth_bytes, depth_byte_size)
+                                               cast_np_array_to_pointer(color_bytes), color_bytes.size,
+                                               cast_np_array_to_pointer(depth_bytes), depth_bytes.size)
 
     def write_audio_frame(self, time_point_us: int, audio_bytes, audio_byte_size: int):
         lib.rgbd_file_writer_write_audio_frame(self.ptr, time_point_us, audio_bytes, audio_byte_size)

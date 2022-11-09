@@ -65,9 +65,9 @@ class NativeColorEncoder:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def encode(self, y_channel, u_channel, v_channel, keyframe) -> NativeColorEncoderFrame:
+    def encode(self, yuv_frame: YuvFrame, keyframe) -> NativeColorEncoderFrame:
         return NativeColorEncoderFrame(lib.rgbd_color_encoder_encode(self.ptr,
-                                                                     y_channel,
-                                                                     u_channel,
-                                                                     v_channel,
+                                                                     cast_np_array_to_pointer(yuv_frame.y_channel),
+                                                                     cast_np_array_to_pointer(yuv_frame.u_channel),
+                                                                     cast_np_array_to_pointer(yuv_frame.v_channel),
                                                                      keyframe))

@@ -26,23 +26,19 @@ def main():
     color_arrays = []
     with rgbd.NativeColorDecoder() as color_decoder:
         for video_frame in file.video_frames:
-            color_bytes = video_frame.color_bytes
-            with color_decoder.decode(rgbd.cast_np_array_to_pointer(color_bytes), color_bytes.size) as native_yuv_frame:
-                yuv_frame = rgbd.YuvFrame(native_yuv_frame)
-                color_array = rgbd.convert_yuv420_to_rgb(yuv_frame.y_channel, yuv_frame.u_channel, yuv_frame.v_channel)
-                color_arrays.append(color_array)
+            yuv_frame = color_decoder.decode(video_frame.color_bytes)
+            color_array = rgbd.convert_yuv420_to_rgb(yuv_frame.y_channel, yuv_frame.u_channel, yuv_frame.v_channel)
+            color_arrays.append(color_array)
 
     # Decode depth frames.
-    depth_arrays = []
+    depth_frames = []
     with rgbd.NativeDepthDecoder(rgbd.lib.RGBD_DEPTH_CODEC_TYPE_TDC1) as depth_decoder:
         for video_frame in file.video_frames:
-            depth_bytes = video_frame.depth_bytes
-            with depth_decoder.decode(rgbd.cast_np_array_to_pointer(depth_bytes), depth_bytes.size) as native_depth_frame:
-                depth_array = rgbd.convert_native_int32_frame_to_depth_array(native_depth_frame)
-                depth_arrays.append(depth_array)
+            depth_frame = depth_decoder.decode(video_frame.depth_bytes)
+            depth_frames.append(depth_frame)
 
     cv2.imshow("color", cv2.cvtColor(color_arrays[0], cv2.COLOR_RGB2BGR))
-    cv2.imshow("depth", depth_arrays[0].astype(np.uint16))
+    cv2.imshow("depth", depth_frames[0].values.astype(np.uint16))
 
     # for video_frame in file.video_frames:
     #     print(f"video timecode: {video_frame.global_timecode}")
