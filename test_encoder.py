@@ -1,6 +1,7 @@
 import pyrgbd as rgbd
 import requests
 import os.path
+import glm
 
 
 def main():
@@ -126,9 +127,9 @@ def main():
                                           depth_bytes)
 
             file_writer.write_trs_frame(video_frame.global_timecode,
-                                        rgbd.Vector3(0, 0, 0),
-                                        rgbd.Quaternion(1, 0, 0, 0),
-                                        rgbd.Vector3(1, 2, 1))
+                                        glm.vec3(0, 0, 0),
+                                        glm.quat(1, 0, 0, 0),
+                                        glm.vec3(1, 2, 1))
 
     file_writer.flush()
 
