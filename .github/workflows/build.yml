@@ -50,5 +50,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
+
+      # bootstrap.py calls msbuild
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
       - run: poetry run python bootstrap.py
       - run: poetry run python test_encoder.py
