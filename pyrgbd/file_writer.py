@@ -1,9 +1,9 @@
 from ._librgbd import ffi, lib
 from .calibration import NativeCameraCalibration
-from .math import Vector3, Quaternion
 from .frame import YuvFrame
 from .utils import cast_np_array_to_pointer
 import numpy as np
+import glm
 
 
 class NativeFileWriterConfig:
@@ -66,15 +66,15 @@ class NativeFileWriter:
         lib.rgbd_file_writer_write_audio_frame(self.ptr, time_point_us, audio_bytes, audio_byte_size)
 
     def write_imu_frame(self, time_point_us: int,
-                        acceleration: Vector3, rotation_rate: Vector3,
-                        magnetic_field: Vector3, gravity: Vector3):
+                        acceleration: glm.vec3, rotation_rate: glm.vec3,
+                        magnetic_field: glm.vec3, gravity: glm.vec3):
         lib.rgbd_file_writer_write_imu_frame(self.ptr, time_point_us,
                                              acceleration.x, acceleration.y, acceleration.z,
                                              rotation_rate.x, rotation_rate.y, rotation_rate.z,
                                              magnetic_field.x, magnetic_field.y, magnetic_field.z,
                                              gravity.x, gravity.y, gravity.z)
     def write_trs_frame(self, time_point_us: int,
-                        translation: Vector3, rotation: Quaternion, scale: Vector3):
+                        translation: glm.vec3, rotation: glm.vec3, scale: glm.vec3):
         lib.rgbd_file_writer_write_trs_frame(self.ptr, time_point_us,
                                              translation.x, translation.y, translation.z,
                                              rotation.w, rotation.x, rotation.y, rotation.z,

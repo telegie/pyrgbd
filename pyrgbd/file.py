@@ -2,7 +2,7 @@ from ._librgbd import ffi, lib
 from .capi_containers import NativeByteArray
 from .calibration import NativeCameraCalibration, CameraCalibration
 import numpy as np
-from .math import Vector3
+import glm
 
 
 class NativeFileInfo:
@@ -313,22 +313,22 @@ class FileIMUFrame:
         acceleration_x = native_file_imu_frame.get_acceleration_x()
         acceleration_y = native_file_imu_frame.get_acceleration_y()
         acceleration_z = native_file_imu_frame.get_acceleration_z()
-        self.acceleration = Vector3(acceleration_x, acceleration_y, acceleration_z)
+        self.acceleration = glm.vec3(acceleration_x, acceleration_y, acceleration_z)
 
         rotation_rate_x = native_file_imu_frame.get_rotation_rate_x()
         rotation_rate_y = native_file_imu_frame.get_rotation_rate_y()
         rotation_rate_z = native_file_imu_frame.get_rotation_rate_z()
-        self.rotation_rate = Vector3(rotation_rate_x, rotation_rate_y, rotation_rate_z)
+        self.rotation_rate = glm.vec3(rotation_rate_x, rotation_rate_y, rotation_rate_z)
 
         magnetic_field_x = native_file_imu_frame.get_magnetic_field_x()
         magnetic_field_y = native_file_imu_frame.get_magnetic_field_y()
         magnetic_field_z = native_file_imu_frame.get_magnetic_field_z()
-        self.magnetic_field = Vector3(magnetic_field_x, magnetic_field_y, magnetic_field_z)
+        self.magnetic_field = glm.vec3(magnetic_field_x, magnetic_field_y, magnetic_field_z)
 
         gravity_x = native_file_imu_frame.get_gravity_x()
         gravity_y = native_file_imu_frame.get_gravity_y()
         gravity_z = native_file_imu_frame.get_gravity_z()
-        self.gravity = Vector3(gravity_x, gravity_y, gravity_z)
+        self.gravity = glm.vec3(gravity_x, gravity_y, gravity_z)
 
 
 class File:

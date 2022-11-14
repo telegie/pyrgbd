@@ -8,5 +8,4 @@ from .file import *
 from .file_parser import *
 from .file_writer import *
 from .frame import *
-from .math import *
 from .utils import *
