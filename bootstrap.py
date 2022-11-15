@@ -8,6 +8,8 @@ import subprocess
 
 def build_librgbd():
     here = Path(__file__).parent.resolve()
+    subprocess.run(["python3", f"{here}/librgbd/bootstrap.py"])
+
     if platform.system() == "Windows":
         subprocess.run(["mkdir", f"{here}\\build"], shell=True)
         # Skipping -A x64 causes a problem when running INSTALL.vcxproj.
