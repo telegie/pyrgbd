@@ -73,7 +73,7 @@ def compile_with_cffi():
 
     cdef_lines = []
     inside_cplusplus = False
-    with open(os.path.join(librgbd_include_dir, "rgbd\\rgbd_capi.h")) as f:
+    with open(os.path.join(librgbd_include_dir, "rgbd/rgbd_capi.h")) as f:
         lines = f.readlines()
         for line in lines:
             # Ignore lines only for when __cplusplus is defined.
