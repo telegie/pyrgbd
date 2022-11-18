@@ -1,6 +1,7 @@
 from ._librgbd import ffi, lib
 from .capi_containers import NativeByteArray
 from .calibration import NativeCameraCalibration, CameraCalibration
+from .direction_table import NativeDirectionTable, DirectionTable
 import numpy as np
 import glm
 
@@ -252,6 +253,12 @@ class NativeFile:
     def get_imu_frame(self, index: int) -> NativeFileIMUFrame:
         return NativeFileIMUFrame(lib.rgbd_file_get_imu_frame(self.ptr, index), False)
 
+    def has_direction_table(self) -> bool:
+        return lib.rgbd_file_has_direction_table(self.ptr)
+
+    def get_direction_table(self) -> NativeDirectionTable:
+        return NativeDirectionTable(lib.rgbd_file_get_direction_table(self.ptr), False)
+
 
 class FileInfo:
     def __init__(self, native_file_info: NativeFileInfo):
@@ -357,6 +364,11 @@ class File:
         for index in range(imu_frame_count):
             with native_file.get_imu_frame(index) as native_file_imu_frame:
                 self.imu_frames.append(FileIMUFrame(native_file_imu_frame))
+
+        if native_file.has_direction_table():
+            self.direction_table = DirectionTable(native_file.get_direction_table())
+        else:
+            self.direction_table = None
 
 
 def get_calibration_directions(native_file: NativeFile) -> np.ndarray:

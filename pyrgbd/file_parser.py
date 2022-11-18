@@ -15,8 +15,5 @@ class NativeFileParser:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def parse_no_frames(self) -> rgbd_file.NativeFile:
-        return rgbd_file.NativeFile(lib.rgbd_file_parser_parse_no_frames(self.ptr))
-
-    def parse_all_frames(self) -> rgbd_file.NativeFile:
-        return rgbd_file.NativeFile(lib.rgbd_file_parser_parse_all_frames(self.ptr))
+    def parse(self, with_frames: bool, with_directions: bool) -> rgbd_file.NativeFile:
+        return rgbd_file.NativeFile(lib.rgbd_file_parser_parse(self.ptr, with_frames, with_directions))
