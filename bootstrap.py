@@ -8,7 +8,7 @@ import subprocess
 
 def build_librgbd():
     here = Path(__file__).parent.resolve()
-    subprocess.run(["python3", f"{here}/librgbd/bootstrap.py"])
+    subprocess.run(["python3", f"{here}/librgbd/bootstrap.py"], check=True)
 
     if platform.system() == "Windows":
         subprocess.run(["mkdir", f"{here}\\build"], shell=True)
@@ -22,10 +22,12 @@ def build_librgbd():
         subprocess.run(["make", "-C", f"{here}/build", "-j8"])
         subprocess.run(["make", "-C", f"{here}/build", "install"])
     elif platform.system() == "Linux":
-        subprocess.run(["mkdir", f"{here}/build"])
-        subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", f"{here}/build", "-D", f"CMAKE_INSTALL_PREFIX={here}/install"])
-        subprocess.run(["make", "-C", f"{here}/build", "-j8"])
-        subprocess.run(["make", "-C", f"{here}/build", "install"])
+        build_path = f"{here}/build/x64-linux"
+        if not os.path.exists(build_path):
+            os.makedirs(build_path)
+        subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", build_path, "-D", f"CMAKE_INSTALL_PREFIX={here}/install"], check=True)
+        subprocess.run(["make", "-C", build_path, "-j8"], check=True)
+        subprocess.run(["make", "-C", build_path, "install"], check=True)
 
 
 def compile_with_cffi():
