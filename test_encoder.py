@@ -30,7 +30,7 @@ def main():
     #                                                     write_config)
 
     with rgbd.NativeFileParser(video_file_path) as native_file_parser:
-        with native_file_parser.parse_all_frames() as native_file:
+        with native_file_parser.parse(True, True) as native_file:
             file = rgbd.File(native_file)
 
     with file.attachments.camera_calibration.create_native_instance() as native_calibration:
