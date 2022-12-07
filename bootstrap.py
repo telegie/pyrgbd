@@ -6,31 +6,11 @@ import shutil
 import subprocess
 
 
-def build_librgbd():
-    here = Path(__file__).parent.resolve()
-    subprocess.run(["python3", f"{here}/librgbd/bootstrap.py"], check=True)
-
-    if platform.system() == "Windows":
-        # Skipping -A x64 causes a problem when running INSTALL.vcxproj.
-        # ref: https://stackoverflow.com/questions/62448981/cmake-msbuild-fails-to-build-vctargetspath-vcxproj
-        subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", f"{here}/build", "-A", "x64", "-D", f"CMAKE_INSTALL_PREFIX={here}/install"], check=True)
-        subprocess.run(["msbuild", f"{here}/build/INSTALL.vcxproj", "/p:Configuration=RelWithDebInfo"], check=True)
-    elif platform.system() == "Darwin":
-        subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", f"{here}/build", "-D", f"CMAKE_INSTALL_PREFIX={here}/install"], check=True)
-        subprocess.run(["make", "-C", f"{here}/build", "-j8"], check=True)
-        subprocess.run(["make", "-C", f"{here}/build", "install"], check=True)
-    elif platform.system() == "Linux":
-        build_path = f"{here}/build/x64-linux"
-        subprocess.run(["cmake", "-S", f"{here}/librgbd", "-B", build_path, "-D", f"CMAKE_INSTALL_PREFIX={here}/install"], check=True)
-        subprocess.run(["make", "-C", build_path, "-j8"], check=True)
-        subprocess.run(["make", "-C", build_path, "install"], check=True)
-
-
 def compile_with_cffi():
     here = Path(__file__).parent.resolve()
     ffi = FFI()
     if platform.system() == "Windows":
-        librgbd_path = f"{here}/install"
+        librgbd_path = f"{here}/librgbd/install/x64-windows"
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd"
         librgbd_library_dir = f"{librgbd_path}/bin"
@@ -42,7 +22,7 @@ def compile_with_cffi():
                        library_dirs=[str(librgbd_library_dir)])
 
     elif platform.system() == "Darwin":
-        librgbd_path = f"{here}/install"
+        librgbd_path = f"{here}/librgbd/install/arm64-mac"
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd"
         librgbd_library_dir = f"{librgbd_path}/bin"
@@ -57,7 +37,7 @@ def compile_with_cffi():
                        extra_link_args=[extra_link_args_str])
 
     elif platform.system() == "Linux":
-        librgbd_path = f"{here}/install"
+        librgbd_path = f"{here}/librgbd/install/x64-linux"
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd"
         librgbd_library_dir = f"{librgbd_path}/bin"
@@ -100,7 +80,7 @@ def copy_binaries():
     here = Path(__file__).parent.resolve()
 
     if platform.system() == "Windows":
-        librgbd_dll_dirs = [f"{here}/install/bin"]
+        librgbd_dll_dirs = [f"{here}/librgbd/install/x64-windows/bin"]
         librgbd_dll_filenames = ["rgbd.dll"]
 
         ffmpeg_binaries_dir = f"{here}/librgbd/deps/ffmpeg-binaries"
@@ -121,7 +101,7 @@ def copy_binaries():
             shutil.copy(f"{dll_dir}\\{dll_filename}", destination)
 
     if platform.system() == "Darwin":
-        librgbd_bin_dir = f"{here}/install/bin"
+        librgbd_bin_dir = f"{here}/librgbd/install/arm64-mac/bin"
         destination = f"{here}/pyrgbd/librgbd.dylib"
         # Should remove the existing one before copying.
         # Simply copying does not overwrite properly.
@@ -130,7 +110,7 @@ def copy_binaries():
         shutil.copy(f"{librgbd_bin_dir}/librgbd.dylib", destination)
 
     if platform.system() == "Linux":
-        librgbd_bin_dir = f"{here}/install/bin"
+        librgbd_bin_dir = f"{here}/librgbd/install/x64-linux/bin"
         destination = f"{here}/pyrgbd/librgbd.so"
         # Should remove the existing one before copying.
         # Simply copying does not overwrite properly.
@@ -140,7 +120,8 @@ def copy_binaries():
 
 
 def main():
-    build_librgbd()
+    here = Path(__file__).parent.resolve()
+    subprocess.run(["python3", f"{here}/librgbd/build.py"], check=True)
     print("build_librgbd done")
     compile_with_cffi()
     print("compile_with_cffi done")
