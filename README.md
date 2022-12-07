@@ -1,7 +1,7 @@
 # pyrgbd
 
 [![MIT License](https://img.shields.io/github/license/telegie/librgbd)](https://en.wikipedia.org/wiki/MIT_License)
-[![Build Status](https://github.com/telegie/librgbd/actions/workflows/build.yml/badge.svg)](https://github.com/telegie/librgbd/actions/workflows/build.yml)
+[![Build Status](https://github.com/telegie/pyrgbd/actions/workflows/build.yml/badge.svg)](https://github.com/telegie/librgbd/actions/workflows/build.yml)
 
 pyrgbd is a Python library for read and writing RGBD videos files based on libmatroska.
 
