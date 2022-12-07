@@ -20,9 +20,14 @@ def compile_with_cffi():
                        include_dirs=[str(librgbd_include_dir)],
                        libraries=[library_str],
                        library_dirs=[str(librgbd_library_dir)])
-
     elif platform.system() == "Darwin":
-        librgbd_path = f"{here}/librgbd/install/arm64-mac"
+        if platform.machine() == "arm64":
+            librgbd_path = f"{here}/librgbd/install/arm64-mac"
+        elif platform.machine() == "x86_64":
+            librgbd_path = f"{here}/librgbd/install/x64-mac"
+        else:
+            raise f"Unknown platform.machine(): {platform.machine()}"
+
         librgbd_include_dir = f"{librgbd_path}/include"
         library_str = "rgbd"
         librgbd_library_dir = f"{librgbd_path}/bin"
@@ -35,7 +40,6 @@ def compile_with_cffi():
                        libraries=[library_str],
                        library_dirs=[str(librgbd_library_dir)],
                        extra_link_args=[extra_link_args_str])
-
     elif platform.system() == "Linux":
         librgbd_path = f"{here}/librgbd/install/x64-linux"
         librgbd_include_dir = f"{librgbd_path}/include"
@@ -49,6 +53,8 @@ def compile_with_cffi():
                        libraries=[library_str],
                        library_dirs=[str(librgbd_library_dir)],
                        extra_link_args=[extra_link_args_str])
+    else:
+        raise f"Unknown platform.system(): {platform.system()}"
 
 
     cdef_lines = []
@@ -99,17 +105,20 @@ def copy_binaries():
             if os.path.exists(destination):
                 os.remove(destination)
             shutil.copy(f"{dll_dir}\\{dll_filename}", destination)
-
-    if platform.system() == "Darwin":
-        librgbd_bin_dir = f"{here}/librgbd/install/arm64-mac/bin"
+    elif platform.system() == "Darwin":
+        if platform.machine() == "arm64":
+            librgbd_bin_dir = f"{here}/librgbd/install/arm64-mac/bin"
+        elif platform.machine() == "x86_64":
+            librgbd_bin_dir = f"{here}/librgbd/install/x64-mac/bin"
+        else:
+            raise f"Unknown platform.machine(): {platform.machine()}"
         destination = f"{here}/pyrgbd/librgbd.dylib"
         # Should remove the existing one before copying.
         # Simply copying does not overwrite properly.
         if os.path.exists(destination):
             os.remove(destination)
         shutil.copy(f"{librgbd_bin_dir}/librgbd.dylib", destination)
-
-    if platform.system() == "Linux":
+    elif platform.system() == "Linux":
         librgbd_bin_dir = f"{here}/librgbd/install/x64-linux/bin"
         destination = f"{here}/pyrgbd/librgbd.so"
         # Should remove the existing one before copying.
@@ -117,6 +126,8 @@ def copy_binaries():
         if os.path.exists(destination):
             os.remove(destination)
         shutil.copy(f"{librgbd_bin_dir}/librgbd.so", destination)
+    else:
+        raise f"Unknown platform.system(): {platform.system()}"
 
 
 def main():
