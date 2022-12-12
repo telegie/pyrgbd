@@ -13,12 +13,12 @@ This library can read files exported from the Telegie and is based on librgbd.
 - apt install python3.9-dev python3.9-distutils libgl1 python3-venv python3-cachecontrol
 
 ## Setup
-- poetry shell
-- pip install -U setuptools
-- poetry install
 - git submodule update --init --recursive
+- poetry shell
+- poetry install
 - python bootstrap.py
 
-## Packaging
+## Deploy
 - python -m build --wheel
-- Not using poetry build since it only supports pure python packages (yet).
+- twine check dist/*
+- twine upload dist/*
