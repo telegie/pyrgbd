@@ -1,5 +1,6 @@
 from setuptools import setup
 import io
+from pathlib import Path
 
 
 # This part is to create bdist_wheel to let setuptools know that this package is not pure python.
@@ -13,6 +14,7 @@ try:
 except ImportError:
     bdist_wheel = None
 
+here = Path(__file__).parent.resolve()
 long_description = io.open("README.md", encoding="utf-8").read()
 
 setup(
@@ -29,10 +31,11 @@ setup(
     package_data={
         'pyrgbd': ["_librgbd.cpython-39-darwin.so",
                    "_librgbd.cpython-310-darwin.so",
-                   "librgbd-1.dylib",
+                   f"{here}/librgbd/install/arm64-mac/bin/librgbd.dylib",
+                   f"{here}/librgbd/install/x64-mac/bin/librgbd.dylib",
                    "_librgbd.cpython-39-x86_64-linux-gnu.so",
                    "_librgbd.cpython-310-x86_64-linux-gnu.so",
-                   "librgbd-1.so"]
+                   f"{here}/librgbd/install/x64-linux/bin/librgbd.so"]
     },
     cmdclass={'bdist_wheel': bdist_wheel}
 )
