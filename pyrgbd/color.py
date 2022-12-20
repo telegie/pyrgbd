@@ -1,6 +1,6 @@
 from ._librgbd import ffi, lib
 from .frame import NativeYuvFrame, YuvFrame
-from .av_packet_handle import NativeAVPacketHandle
+from .capi_containers import NativeByteArray
 from .utils import cast_np_array_to_pointer
 import numpy as np
 
@@ -29,23 +29,6 @@ class NativeColorDecoder:
         return yuv_frame
 
 
-class NativeColorEncoderFrame:
-    def __init__(self, ptr):
-        self.ptr = ptr
-
-    def close(self):
-        lib.rgbd_color_encoder_frame_dtor(self.ptr)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
-
-    def get_packet(self) -> NativeAVPacketHandle:
-        return NativeAVPacketHandle(lib.rgbd_color_encoder_frame_get_packet(self.ptr), False)
-
-
 class NativeColorEncoder:
     def __init__(self, color_codec_type, width: int, height: int, target_bitrate: int, framerate: int):
         # Setting lib.VP8 assuming since it is the only codec for now.
@@ -65,9 +48,9 @@ class NativeColorEncoder:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def encode(self, yuv_frame: YuvFrame, keyframe) -> NativeColorEncoderFrame:
-        return NativeColorEncoderFrame(lib.rgbd_color_encoder_encode(self.ptr,
-                                                                     cast_np_array_to_pointer(yuv_frame.y_channel),
-                                                                     cast_np_array_to_pointer(yuv_frame.u_channel),
-                                                                     cast_np_array_to_pointer(yuv_frame.v_channel),
-                                                                     keyframe))
+    def encode(self, yuv_frame: YuvFrame, keyframe) -> np.array:
+        return NativeByteArray(lib.rgbd_color_encoder_encode(self.ptr,
+                                                             cast_np_array_to_pointer(yuv_frame.y_channel),
+                                                             cast_np_array_to_pointer(yuv_frame.u_channel),
+                                                             cast_np_array_to_pointer(yuv_frame.v_channel),
+                                                             keyframe)).to_np_array()

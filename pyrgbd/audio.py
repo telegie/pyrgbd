@@ -1,5 +1,6 @@
 from ._librgbd import ffi, lib
-from .av_packet_handle import NativeAVPacketHandle
+import numpy as np
+from .capi_containers import NativeByteArray
 
 
 class NativeAudioEncoderFrame:
@@ -15,11 +16,11 @@ class NativeAudioEncoderFrame:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def get_packet_count(self):
-        return lib.rgbd_audio_encoder_frame_get_packet_count(self.ptr)
+    def get_packet_bytes_list_count(self):
+        return lib.rgbd_audio_encoder_frame_get_packet_bytes_list_count(self.ptr)
 
-    def get_packet(self, index: int) -> NativeAVPacketHandle:
-        return NativeAVPacketHandle(lib.rgbd_audio_encoder_frame_get_packet(self.ptr, index), False)
+    def get_packet_bytes(self, index: int) -> np.array:
+        return NativeByteArray(lib.rgbd_audio_encoder_frame_get_packet(self.ptr, index)).to_np_array()
 
 
 class NativeAudioEncoder:

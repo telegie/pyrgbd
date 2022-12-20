@@ -137,6 +137,9 @@ class NativeIosCameraCalibration(NativeCameraCalibration):
     def get_lens_distortion_lookup_table(self) -> NativeFloatArray:
         return NativeFloatArray(lib.rgbd_ios_camera_calibration_get_lens_distortion_lookup_table(self.ptr))
 
+    def get_inverse_lens_distortion_lookup_table(self) -> NativeFloatArray:
+        return NativeFloatArray(lib.rgbd_ios_camera_calibration_get_inverse_lens_distortion_lookup_table(self.ptr))
+
 
 class NativeUndistortedCameraCalibration(NativeCameraCalibration):
     def __init__(self, ptr, owner: bool):
@@ -241,6 +244,8 @@ class IosCameraCalibration(CameraCalibration):
         self.lens_distortion_center_y = native_ios_camera_calibration.get_lens_distortion_center_y()
         with native_ios_camera_calibration.get_lens_distortion_lookup_table() as lens_distortion_lookup_table:
             self.lens_distortion_lookup_table = lens_distortion_lookup_table.to_np_array()
+        with native_ios_camera_calibration.get_inverse_lens_distortion_lookup_table() as lookup_table:
+            self.inverse_lens_distortion_lookup_table = lookup_table.to_np_array()
 
     def create_native_instance(self) -> NativeIosCameraCalibration:
         ptr = lib.rgbd_ios_camera_calibration_ctor(self.color_width,
@@ -256,7 +261,9 @@ class IosCameraCalibration(CameraCalibration):
                                                    self.lens_distortion_center_x,
                                                    self.lens_distortion_center_y,
                                                    cast_np_array_to_pointer(self.lens_distortion_lookup_table),
-                                                   self.lens_distortion_lookup_table.size)
+                                                   self.lens_distortion_lookup_table.size,
+                                                   cast_np_array_to_pointer(self.inverse_lens_distortion_lookup_table),
+                                                   self.inverse_lens_distortion_lookup_table.size)
         return NativeIosCameraCalibration(ptr, True)
 
 
