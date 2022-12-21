@@ -52,5 +52,4 @@ class NativeDepthEncoder:
         return NativeByteArray(
             lib.rgbd_depth_encoder_encode(self.ptr,
                                           cast_np_array_to_pointer(depth_values),
-                                          depth_values.size,
                                           keyframe)).to_np_array()

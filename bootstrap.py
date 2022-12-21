@@ -4,6 +4,7 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 
 
 def compile_with_cffi():
@@ -132,7 +133,9 @@ def copy_binaries():
 
 def main():
     here = Path(__file__).parent.resolve()
-    subprocess.run(["python3", f"{here}/librgbd/build.py"], check=True)
+    args = ["python3", f"{here}/librgbd/build.py"]
+    args += sys.argv[1:]
+    subprocess.run(args, check=True)
     print("build_librgbd done")
     compile_with_cffi()
     print("compile_with_cffi done")
