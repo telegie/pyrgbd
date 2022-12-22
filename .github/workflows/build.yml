@@ -56,6 +56,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          brew install ninja
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
@@ -85,6 +86,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get -y install ninja-build
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
