@@ -34,7 +34,7 @@ class NativeFileWriterConfig:
 
 class NativeFileWriter:
     def __init__(self, file_path, native_calibration: NativeCameraCalibration, native_config: NativeFileWriterConfig):
-        self.ptr = lib.rgbd_file_writer_ctor(file_path.encode("utf8"), native_calibration.ptr, native_config.ptr)
+        self.ptr = lib.rgbd_file_writer_ctor_to_path(file_path.encode("utf8"), native_calibration.ptr, native_config.ptr)
 
     def close(self):
         lib.rgbd_file_writer_dtor(self.ptr)
