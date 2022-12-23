@@ -50,11 +50,8 @@ class NativeFileWriter:
                                          yuv_frame.width,
                                          yuv_frame.height,
                                          cast_np_array_to_pointer(yuv_frame.y_channel),
-                                         yuv_frame.y_channel.size,
                                          cast_np_array_to_pointer(yuv_frame.u_channel),
-                                         yuv_frame.u_channel.size,
-                                         cast_np_array_to_pointer(yuv_frame.v_channel),
-                                         yuv_frame.v_channel.size)
+                                         cast_np_array_to_pointer(yuv_frame.v_channel))
 
     def write_video_frame(self, time_point_us: int, keyframe: bool,
                           color_bytes: np.ndarray, depth_bytes: np.ndarray):
