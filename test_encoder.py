@@ -78,6 +78,13 @@ def main():
 
     audio_frame_index = 0
     imu_frame_index = 0
+
+    minimum_global_timecode = min(
+        file.video_frames[0].global_timecode,
+        file.audio_frames[0].global_timecode,
+        file.imu_frames[0].global_timecode
+    )
+
     with rgbd.NativeColorEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8,
                                  yuv_frame.width,
                                  yuv_frame.height,
@@ -94,7 +101,7 @@ def main():
                 audio_frame = file.audio_frames[audio_frame_index]
                 if audio_frame.global_timecode > video_frame.global_timecode:
                     break
-                file_writer.write_audio_frame(audio_frame.global_timecode,
+                file_writer.write_audio_frame(audio_frame.global_timecode - minimum_global_timecode,
                                               rgbd.cast_np_array_to_pointer(audio_frame.bytes),
                                               audio_frame.bytes.size)
                 audio_frame_index = audio_frame_index + 1
@@ -104,7 +111,7 @@ def main():
                 imu_frame = file.imu_frames[imu_frame_index]
                 if imu_frame.global_timecode > video_frame.global_timecode:
                     break
-                file_writer.write_imu_frame(imu_frame.global_timecode,
+                file_writer.write_imu_frame(imu_frame.global_timecode - minimum_global_timecode,
                                             imu_frame.acceleration,
                                             imu_frame.rotation_rate,
                                             imu_frame.magnetic_field,
@@ -120,12 +127,12 @@ def main():
             color_bytes = color_encoder.encode(yuv_frame, keyframe)
             depth_bytes = depth_encoder.encode(depth_frame.values, keyframe)
 
-            file_writer.write_video_frame(video_frame.global_timecode,
+            file_writer.write_video_frame(video_frame.global_timecode - minimum_global_timecode,
                                           keyframe,
                                           color_bytes,
                                           depth_bytes)
 
-            file_writer.write_trs_frame(video_frame.global_timecode,
+            file_writer.write_trs_frame(video_frame.global_timecode - minimum_global_timecode,
                                         glm.vec3(0, 0, 0),
                                         glm.quat(1, 0, 0, 0),
                                         glm.vec3(1, 2, 1))
