@@ -34,7 +34,7 @@ class NativeFileWriterConfig:
 
 class NativeFileWriter:
     def __init__(self, file_path, native_calibration: NativeCameraCalibration, native_config: NativeFileWriterConfig):
-        self.ptr = lib.rgbd_file_writer_ctor(file_path.encode("utf8"), native_calibration.ptr, native_config.ptr)
+        self.ptr = lib.rgbd_file_writer_ctor_to_path(file_path.encode("utf8"), native_calibration.ptr, native_config.ptr)
 
     def close(self):
         lib.rgbd_file_writer_dtor(self.ptr)
@@ -50,11 +50,8 @@ class NativeFileWriter:
                                          yuv_frame.width,
                                          yuv_frame.height,
                                          cast_np_array_to_pointer(yuv_frame.y_channel),
-                                         yuv_frame.y_channel.size,
                                          cast_np_array_to_pointer(yuv_frame.u_channel),
-                                         yuv_frame.u_channel.size,
-                                         cast_np_array_to_pointer(yuv_frame.v_channel),
-                                         yuv_frame.v_channel.size)
+                                         cast_np_array_to_pointer(yuv_frame.v_channel))
 
     def write_video_frame(self, time_point_us: int, keyframe: bool,
                           color_bytes: np.ndarray, depth_bytes: np.ndarray):
