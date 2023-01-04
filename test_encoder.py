@@ -79,11 +79,11 @@ def main():
     audio_frame_index = 0
     imu_frame_index = 0
 
-    minimum_global_timecode = min(
-        file.video_frames[0].global_timecode,
-        file.audio_frames[0].global_timecode,
-        file.imu_frames[0].global_timecode
-    )
+    minimum_time_point_us = file.video_frames[0].time_point_us
+    if len(file.audio_frames):
+        minimum_time_point_us = min(minimum_time_point_us, file.audio_frames[0].time_point_us)
+    if len(file.imu_frames):
+        minimum_time_point_us = min(minimum_time_point_us, file.imu_frames[0].time_point_us)
 
     with rgbd.NativeColorEncoder(rgbd.lib.RGBD_COLOR_CODEC_TYPE_VP8,
                                  yuv_frame.width,
@@ -99,9 +99,9 @@ def main():
             # Write audio frames fitting in front of the video frame.
             while audio_frame_index < len(file.audio_frames):
                 audio_frame = file.audio_frames[audio_frame_index]
-                if audio_frame.global_timecode > video_frame.global_timecode:
+                if audio_frame.time_point_us > video_frame.time_point_us:
                     break
-                file_writer.write_audio_frame(audio_frame.global_timecode - minimum_global_timecode,
+                file_writer.write_audio_frame(audio_frame.time_point_us - minimum_time_point_us,
                                               rgbd.cast_np_array_to_pointer(audio_frame.bytes),
                                               audio_frame.bytes.size)
                 audio_frame_index = audio_frame_index + 1
@@ -109,9 +109,9 @@ def main():
             # Write IMU frames fitting in front of the video frame.
             while imu_frame_index < len(file.imu_frames):
                 imu_frame = file.imu_frames[imu_frame_index]
-                if imu_frame.global_timecode > video_frame.global_timecode:
+                if imu_frame.time_point_us > video_frame.time_point_us:
                     break
-                file_writer.write_imu_frame(imu_frame.global_timecode - minimum_global_timecode,
+                file_writer.write_imu_frame(imu_frame.time_point_us - minimum_time_point_us,
                                             imu_frame.acceleration,
                                             imu_frame.rotation_rate,
                                             imu_frame.magnetic_field,
@@ -127,12 +127,12 @@ def main():
             color_bytes = color_encoder.encode(yuv_frame, keyframe)
             depth_bytes = depth_encoder.encode(depth_frame.values, keyframe)
 
-            file_writer.write_video_frame(video_frame.global_timecode - minimum_global_timecode,
+            file_writer.write_video_frame(video_frame.time_point_us - minimum_time_point_us,
                                           keyframe,
                                           color_bytes,
                                           depth_bytes)
 
-            file_writer.write_trs_frame(video_frame.global_timecode - minimum_global_timecode,
+            file_writer.write_trs_frame(video_frame.time_point_us - minimum_time_point_us,
                                         glm.vec3(0, 0, 0),
                                         glm.quat(1, 0, 0, 0),
                                         glm.vec3(1, 2, 1))

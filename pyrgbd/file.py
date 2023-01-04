@@ -111,8 +111,8 @@ class NativeFileVideoFrame:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def get_global_timecode(self) -> int:
-        return lib.rgbd_file_video_frame_get_global_timecode(self.ptr)
+    def get_time_point_us(self) -> int:
+        return lib.rgbd_file_video_frame_get_time_point_us(self.ptr)
 
     def get_keyframe(self) -> bool:
         return lib.rgbd_file_video_frame_get_keyframe(self.ptr)
@@ -151,8 +151,8 @@ class NativeFileAudioFrame:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def get_global_timecode(self) -> int:
-        return lib.rgbd_file_audio_frame_get_global_timecode(self.ptr)
+    def get_time_point_us(self) -> int:
+        return lib.rgbd_file_audio_frame_get_time_point_us(self.ptr)
 
     def get_bytes(self) -> NativeByteArray:
         return NativeByteArray(lib.rgbd_file_audio_frame_get_bytes(self.ptr))
@@ -173,8 +173,8 @@ class NativeFileIMUFrame:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def get_global_timecode(self) -> int:
-        return lib.rgbd_file_imu_frame_get_global_timecode(self.ptr)
+    def get_time_point_us(self) -> int:
+        return lib.rgbd_file_imu_frame_get_time_point_us(self.ptr)
 
     def get_acceleration_x(self) -> float:
         return lib.rgbd_file_imu_frame_get_acceleration_x(self.ptr)
@@ -294,7 +294,7 @@ class FileTracks:
 
 class FileVideoFrame:
     def __init__(self, native_file_video_frame: NativeFileVideoFrame):
-        self.global_timecode = native_file_video_frame.get_global_timecode()
+        self.time_point_us = native_file_video_frame.get_time_point_us()
         self.keyframe = native_file_video_frame.get_keyframe()
         with native_file_video_frame.get_color_bytes() as color_bytes:
             self.color_bytes = color_bytes.to_np_array()
@@ -308,14 +308,14 @@ class FileVideoFrame:
 
 class FileAudioFrame:
     def __init__(self, native_file_audio_frame: NativeFileAudioFrame):
-        self.global_timecode = native_file_audio_frame.get_global_timecode()
+        self.time_point_us = native_file_audio_frame.get_time_point_us()
         with native_file_audio_frame.get_bytes() as audio_bytes:
             self.bytes = audio_bytes.to_np_array()
 
 
 class FileIMUFrame:
     def __init__(self, native_file_imu_frame: NativeFileIMUFrame):
-        self.global_timecode = native_file_imu_frame.get_global_timecode()
+        self.time_point_us = native_file_imu_frame.get_time_point_us()
 
         acceleration_x = native_file_imu_frame.get_acceleration_x()
         acceleration_y = native_file_imu_frame.get_acceleration_y()

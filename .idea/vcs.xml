@@ -27,6 +27,7 @@
     <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/opencv-binaries/opencv_contrib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/spdlog" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/librgbd-binaries/librgbd/deps/zstd" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/librgbd/deps/Catch2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/librgbd/deps/GSL" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/librgbd/deps/cli" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/librgbd/deps/cxxopts" vcs="Git" />
