@@ -1,3 +1,5 @@
+Archieved: has been moved to /python of librgbd.
+
 # pyrgbd
 
 [![MIT License](https://img.shields.io/github/license/telegie/pyrgbd)](https://en.wikipedia.org/wiki/MIT_License)
